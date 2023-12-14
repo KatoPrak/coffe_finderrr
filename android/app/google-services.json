@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "104377366523",
+    "project_id": "carikopipbl",
+    "storage_bucket": "carikopipbl.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104377366523:android:1d5b5f4b67e2001c81fd5e",
+        "android_client_info": {
+          "package_name": "com.example.coffe_finder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkJNlLnqwpOfvqdJk4lKaUORQP1aKL7Ts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
