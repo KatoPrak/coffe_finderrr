@@ -1,3 +1,4 @@
+import 'package:coffe_finder/customer/tentang-cafe.dart';
 import 'package:coffe_finder/pemiliktoko/buat-fasilitas-jam.dart';
 import 'package:coffe_finder/splash.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Fasilitas(),
+      home: AboutCafe(),
     );
   }
 }

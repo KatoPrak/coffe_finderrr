@@ -1,9 +1,7 @@
-import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'dart:ui';
 
@@ -794,15 +792,13 @@ class _AboutCafeState extends State<AboutCafe>
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      value,
-                                      style: GoogleFonts.mulish(
-                                        textStyle: Theme.of(context)
-                                            .textTheme
-                                            .displayLarge,
+                                      'Ramai',
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         height: 1.255,
-                                        color: Color(0xb2333333),
+                                        letterSpacing: -0.14,
+                                        color: Color(0xFF333333),
                                       ),
                                     ),
                                   ],
@@ -834,21 +830,19 @@ class _AboutCafeState extends State<AboutCafe>
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      value,
-                                      style: GoogleFonts.mulish(
-                                        textStyle: Theme.of(context)
-                                            .textTheme
-                                            .displayLarge,
+                                      'Sepi',
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         height: 1.255,
                                         letterSpacing: -0.14,
-                                        color: Color(0xb2333333),
+                                        color: Color(0xFF333333),
                                       ),
                                     ),
                                   ],
                                 ),
                               );
+                              5;
                             }).toList(),
                           ),
                         ],

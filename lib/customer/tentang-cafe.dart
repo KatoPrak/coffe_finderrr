@@ -1,12 +1,642 @@
-import 'package:coffe_finder/customer/tab1.dart';
-import 'package:coffe_finder/customer/tab2.dart';
+import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'dart:ui';
+
+class Tab1 extends StatelessWidget {
+  const Tab1({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: GestureDetector(
+          onTap: () {
+            // Handle the tap on the main body
+            print('Widget diketuk!');
+          },
+          child: SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              color: Color(0xFFF6F0E9),
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(),
+                  SizedBox(height: 20),
+                  Text(
+                    'Deskripsi',
+                    style: TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat...',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      color: Color(0xFF1B1D1F),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF2F2F2),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Color.fromARGB(20, 0, 0, 0),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Jam Operasional',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text('Senin - Jumat: 09.00 - 18.00'),
+                        Text('Sabtu: 10.00 - 15.00'),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 5.0),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF2F2F2),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Color.fromARGB(20, 0, 0, 0),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fasilitas',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text('Wifi'),
+                        Text('Parkir'),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image:
+                            AssetImage('lib/images/KeboonKopi/Cappuccino.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                      color: Color(0xFFF2F2F2),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Color.fromARGB(20, 0, 0, 0),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Kopi Cat Cafe By Groovy',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        Text(
+                            'Jl. Kyai Maja No.29 RT.10/RW.7, Kramat Pela, KEC.Kby.Baru.Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta'),
+                        SizedBox(height: 20.0),
+                        Text(
+                          'Petunjuk Jalan',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            color: Color(0xFF971E09),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 15.0),
+                        Container(
+                            width: double.maxFinite,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: GestureDetector(
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                              ),
+                            )),
+                      ],
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children:
+                          List.generate(5, (index) => index + 1).map((index) {
+                        return ReviewCard(
+                          username: 'John Doe $index',
+                          rating: 4,
+                          comment: 'Tempat yang bagus untuk nongkrong $index.',
+                          imagePaths: [
+                            'lib/images/plastik.jpeg',
+                            'lib/images/plastik.jpeg',
+                            'lib/images/plastik.jpeg',
+                          ],
+                          guestProfilePhoto: 'lib/images/profile-guest.png',
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        persistentFooterButtons: [
+          Container(
+            height: 60,
+            width: MediaQuery.of(context)
+                .size
+                .width, // Set the width to the full screen width
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Ulasan()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xFF4E598C),
+              ),
+              child: Text(
+                'Tulis Ulasan & Rating',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ]);
+  }
+}
+
+void main() {
+  runApp(
+    MaterialApp(
+      home: Tab1(),
+    ),
+  );
+}
+
+class ReviewCard extends StatelessWidget {
+  final String username;
+  final int rating;
+  final String comment;
+  final List<String> imagePaths;
+  final String guestProfilePhoto;
+
+  const ReviewCard({
+    Key? key,
+    required this.username,
+    required this.rating,
+    required this.comment,
+    required this.imagePaths,
+    required this.guestProfilePhoto,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      color: Color(0xFFF2F2F2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      elevation: 5, // Set the elevation for the drop shadow
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20.0,
+                  backgroundImage: AssetImage(guestProfilePhoto),
+                ),
+                SizedBox(width: 15.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$username',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        _buildStarIcons(rating),
+                        SizedBox(width: 4.0),
+                        Text(
+                          '$rating',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 15.0),
+          Text(
+            comment,
+            style: TextStyle(fontSize: 14.0),
+          ),
+          SizedBox(height: 8.0),
+          Container(
+            height: 100,
+            color: Color(0xFFF2F2F2),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: imagePaths.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Image.asset(
+                      imagePaths[index],
+                      width: 118,
+                      height: 86,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStarIcons(int rating) {
+    if (rating <= 0) {
+      return Text('No rating');
+    }
+
+    List<Widget> stars = [];
+    final int maxStars = 5;
+
+    for (int i = 0; i < maxStars; i++) {
+      if (i < rating) {
+        stars.add(
+          Row(
+            children: [
+              Icon(
+                Icons.star,
+                color: Color(0xFFE4A70A),
+                size: 20.0,
+              ),
+              if (i == rating - 1 &&
+                  rating != 4) // Show the number "4" when rating is not 4
+                Text(
+                  '$rating',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ],
+          ),
+        );
+      } else {
+        stars.add(
+          Icon(
+            Icons.star_border,
+            color: Color(0xFFE4A70A),
+            size: 20.0,
+          ),
+        );
+      }
+    }
+    return Row(children: stars);
+  }
+}
+
+class Tab2 extends StatelessWidget {
+  const Tab2({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            ProductListPage(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductListPage extends StatefulWidget {
+  @override
+  _ProductListPageState createState() => _ProductListPageState();
+}
+
+class _ProductListPageState extends State<ProductListPage> {
+  final List<String> categories = [
+    'Ice Coffee',
+    'Hot Coffee',
+  ];
+
+  String selectedCategory = '';
+  List<Product> hotCoffeeProducts = [
+    Product(
+      name: 'Cappuccino',
+      description: 'Cold and refreshing',
+      price: 'Rp15.000',
+      category: 'Hot Coffee',
+      image: 'lib/images/KeboonKopi/Cappuccino.jpg',
+    ),
+    Product(
+      name: 'Caffe Latte',
+      description: 'Chilled coffee goodness',
+      price: 'Rp18.000',
+      category: 'Hot Coffee',
+      image: 'lib/images/RimbunKopi/Caffelatte.jpg',
+    ),
+    // Add more Ice Coffee products as needed
+  ];
+  List<Product> iceCoffeeProducts = [
+    Product(
+      name: 'Expresso',
+      description: 'Cold and refreshing',
+      price: 'Rp15.000',
+      category: 'Ice Coffee',
+      image: 'lib/images/LoonamiHouse/Bananauyu.jpg',
+    ),
+    Product(
+      name: 'Americano',
+      description: 'Chilled coffee goodness',
+      price: 'Rp18.000',
+      category: 'Ice Coffee',
+      image: 'lib/images/LoonamiHouse/Blackcurrenttea.jpg',
+    ),
+    // Add more Ice Coffee products as needed
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    List<Product> displayedProducts = [];
+
+    if (selectedCategory.isNotEmpty) {
+      if (selectedCategory == 'Ice Coffee') {
+        displayedProducts = iceCoffeeProducts;
+      } else if (selectedCategory == 'Hot Coffee') {
+        displayedProducts = hotCoffeeProducts;
+      }
+    } else {
+      // Show all products if no category is selected
+      displayedProducts = [...iceCoffeeProducts, ...hotCoffeeProducts];
+    }
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12.0),
+          margin: EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: categories
+                .map(
+                  (category) => Row(
+                    children: [
+                      FilterChip(
+                        label: Text(category),
+                        backgroundColor: selectedCategory == category
+                            ? Color(0xFFA84F2F) // Warna saat dipilih
+                            : Color(0xFFF6F0E9),
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              selectedCategory = category;
+                            } else {
+                              selectedCategory = '';
+                            }
+                          });
+                        },
+                        selected: selectedCategory == category,
+                        labelStyle: TextStyle(
+                          color: selectedCategory == category
+                              ? Colors.black // Warna teks saat dipilih
+                              : Colors.black, // Warna teks saat tidak dipilih
+                        ),
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: selectedCategory == category
+                                ? Colors.transparent // Warna garis saat dipilih
+                                : const Color.fromARGB(57, 158, 158,
+                                    158), // Warna garis saat tidak dipilih
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                      ),
+                      SizedBox(width: 8.0), // Jarak antar kategori
+                    ],
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+
+        // Display the filtered products
+        Container(
+          padding: const EdgeInsets.all(0),
+          child: Column(
+            // ...
+            children: List.generate(displayedProducts.length, (index) {
+              Product product = displayedProducts[index];
+              return Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                child: Row(
+                  children: [
+                    // Gambar disini
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                          25.0), // Atur borderRadius di sini
+                      child: Image.asset(
+                        product.image,
+                        fit: BoxFit.cover,
+                        height: 120,
+                        width: 120,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 15.0,
+                      height: 30,
+                    ),
+                    // Teks disini
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            product.category,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF1B1D1F),
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 35,
+                          ),
+                          Text(
+                            product.price,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF631204),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class Product {
+  final String name;
+  final String description;
+  final String price;
+  final String category;
+  final String image;
+
+  Product({
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.category,
+    required this.image,
+  });
+}
+
+class MenuItem {
+  final String name;
+  final double price;
+  final String imagePath;
+
+  MenuItem({
+    required this.name,
+    required this.price,
+    required this.imagePath,
+  });
+}
+
+class MenuContainer extends StatelessWidget {
+  final String name;
+  final double price;
+  final String imagePath;
+
+  const MenuContainer({
+    Key? key,
+    required this.name,
+    required this.price,
+    required this.imagePath,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class AboutCafe extends StatefulWidget {
   const AboutCafe({Key? key}) : super(key: key);
@@ -176,14 +806,12 @@ class _AboutCafeState extends State<AboutCafe>
                           const SizedBox(width: 6),
                           Text(
                             'Ramai',
-                            style: GoogleFonts.mulish(
-                              textStyle:
-                                  Theme.of(context).textTheme.displayLarge,
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               height: 1.255,
                               letterSpacing: -0.14,
-                              color: Color(0xb2333333),
+                              color: Color(0xFF333333),
                             ),
                           ),
                           const SizedBox(width: 85),
@@ -196,14 +824,12 @@ class _AboutCafeState extends State<AboutCafe>
                           const SizedBox(width: 6),
                           Text(
                             'Open',
-                            style: GoogleFonts.mulish(
-                              textStyle:
-                                  Theme.of(context).textTheme.displayLarge,
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               height: 1.255,
                               letterSpacing: -0.14,
-                              color: Color(0xb2333333),
+                              color: Color(0xFF333333),
                             ),
                           ),
                         ],
@@ -318,6 +944,18 @@ class _AboutCafeState extends State<AboutCafe>
           ],
         ),
       ),
+    );
+  }
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Banner',
+      home: AboutCafe(),
     );
   }
 }
