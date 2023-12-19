@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,12 @@ import 'dart:ui';
 
 class Tab1 extends StatelessWidget {
   const Tab1({Key? key}) : super(key: key);
+
+  Stream<QuerySnapshot> readData() {
+    final ulasan = FirebaseFirestore.instance.collection('ulasan').snapshots();
+
+    return ulasan;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,11 +112,6 @@ class Tab1 extends StatelessWidget {
                     margin: EdgeInsets.symmetric(vertical: 8.0),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image:
-                            AssetImage('lib/images/KeboonKopi/Cappuccino.jpg'),
-                        fit: BoxFit.cover,
-                      ),
                       color: Color(0xFFF2F2F2),
                       borderRadius: BorderRadius.circular(15.0),
                       border: Border.all(
@@ -165,24 +168,48 @@ class Tab1 extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children:
-                          List.generate(5, (index) => index + 1).map((index) {
-                        return ReviewCard(
-                          username: 'John Doe $index',
-                          rating: 4,
-                          comment: 'Tempat yang bagus untuk nongkrong $index.',
-                          imagePaths: [
-                            'lib/images/plastik.jpeg',
-                            'lib/images/plastik.jpeg',
-                            'lib/images/plastik.jpeg',
-                          ],
-                          guestProfilePhoto: 'lib/images/profile-guest.png',
+                  StreamBuilder<QuerySnapshot>(
+                      stream: readData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        }
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: snapshot.data!.docs
+                                .map((DocumentSnapshot document) {
+                              Map<String, dynamic> data =
+                                  document.data() as Map<String, dynamic>;
+
+                              // Periksa apakah 'fotoPaths' ada dalam data
+                              List<String> imagePaths =
+                                  data['fotoPaths'] != null
+                                      ? List.from(data['fotoPaths'])
+                                      : [];
+
+                              return ReviewCard(
+                                username: data['username'],
+                                rating: data[
+                                    'rating'], // Menggunakan rating dari data Firestore
+                                comment: data[
+                                    'review'], // Menggunakan review dari data Firestore
+                                imagePaths:
+                                    imagePaths, // Menggunakan imagePaths dari data Firestore
+                                guestProfilePhoto:
+                                    'lib/images/profile-guest.png',
+                              );
+                            }).toList(),
+                          ),
                         );
-                      }).toList(),
-                    ),
-                  ),
+                      })
                 ],
               ),
             ),
@@ -245,81 +272,82 @@ class ReviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      // Increased margin
       color: Color(0xFFF2F2F2),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(12.0), // Slightly larger radius
       ),
-      elevation: 5, // Set the elevation for the drop shadow
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: Row(
+      elevation: 6, // Slightly higher elevation
+      child: Padding(
+        padding: const EdgeInsets.all(16.0), // Increased padding
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
                 CircleAvatar(
-                  radius: 20.0,
+                  radius: 25.0, // Larger avatar radius
                   backgroundImage: AssetImage(guestProfilePhoto),
                 ),
-                SizedBox(width: 15.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$username',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        _buildStarIcons(rating),
-                        SizedBox(width: 4.0),
-                        Text(
-                          '$rating',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                SizedBox(width: 20.0), // Increased spacing
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$username',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0, // Larger font size
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      Row(
+                        children: [
+                          _buildStarIcons(rating),
+                          SizedBox(width: 8.0), // Increased spacing
+                          Text(
+                            '$rating',
+                            style: TextStyle(
+                              fontSize: 18.0, // Larger font size
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 15.0),
-          Text(
-            comment,
-            style: TextStyle(fontSize: 14.0),
-          ),
-          SizedBox(height: 8.0),
-          Container(
-            height: 100,
-            color: Color(0xFFF2F2F2),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: imagePaths.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Image.asset(
-                      imagePaths[index],
-                      width: 118,
-                      height: 86,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                );
-              },
+            SizedBox(height: 20.0), // Increased spacing
+            Text(
+              comment,
+              style: TextStyle(fontSize: 16.0), // Larger font size for comment
             ),
-          ),
-        ],
+            SizedBox(height: 12.0), // Increased spacing
+            Container(
+              height: 120, // Increased container height for images
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: imagePaths.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        imagePaths[index],
+                        width: 120, // Larger image width
+                        height: 120, // Larger image height
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -335,23 +363,10 @@ class ReviewCard extends StatelessWidget {
     for (int i = 0; i < maxStars; i++) {
       if (i < rating) {
         stars.add(
-          Row(
-            children: [
-              Icon(
-                Icons.star,
-                color: Color(0xFFE4A70A),
-                size: 20.0,
-              ),
-              if (i == rating - 1 &&
-                  rating != 4) // Show the number "4" when rating is not 4
-                Text(
-                  '$rating',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-            ],
+          Icon(
+            Icons.star,
+            color: Color(0xFFE4A70A),
+            size: 20.0,
           ),
         );
       } else {
@@ -364,6 +379,7 @@ class ReviewCard extends StatelessWidget {
         );
       }
     }
+
     return Row(children: stars);
   }
 }
@@ -413,7 +429,7 @@ class _ProductListPageState extends State<ProductListPage> {
       category: 'Hot Coffee',
       image: 'lib/images/RimbunKopi/Caffelatte.jpg',
     ),
-    // Add more Ice Coffee products as needed
+    // Add more Hot Coffee products as needed
   ];
   List<Product> iceCoffeeProducts = [
     Product(
@@ -428,7 +444,7 @@ class _ProductListPageState extends State<ProductListPage> {
       description: 'Chilled coffee goodness',
       price: 'Rp18.000',
       category: 'Ice Coffee',
-      image: 'lib/images/LoonamiHouse/Blackcurrenttea.jpg',
+      image: 'lib/images/KeboonKopi/Cappuccino.jpg',
     ),
     // Add more Ice Coffee products as needed
   ];
@@ -502,7 +518,6 @@ class _ProductListPageState extends State<ProductListPage> {
         Container(
           padding: const EdgeInsets.all(0),
           child: Column(
-            // ...
             children: List.generate(displayedProducts.length, (index) {
               Product product = displayedProducts[index];
               return Container(
@@ -591,51 +606,6 @@ class Product {
     required this.category,
     required this.image,
   });
-}
-
-class MenuItem {
-  final String name;
-  final double price;
-  final String imagePath;
-
-  MenuItem({
-    required this.name,
-    required this.price,
-    required this.imagePath,
-  });
-}
-
-class MenuContainer extends StatelessWidget {
-  final String name;
-  final double price;
-  final String imagePath;
-
-  const MenuContainer({
-    Key? key,
-    required this.name,
-    required this.price,
-    required this.imagePath,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      padding: EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class AboutCafe extends StatefulWidget {
@@ -944,18 +914,6 @@ class _AboutCafeState extends State<AboutCafe>
           ],
         ),
       ),
-    );
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Banner',
-      home: AboutCafe(),
     );
   }
 }

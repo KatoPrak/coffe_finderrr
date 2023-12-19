@@ -1,5 +1,4 @@
-import 'package:coffe_finder/customer/tentang-cafe.dart';
-import 'package:coffe_finder/pemiliktoko/buat-fasilitas-jam.dart';
+import 'package:coffe_finder/pemiliktoko/data-toko.dart';
 import 'package:coffe_finder/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AboutCafe(),
+      home: DataToko(),
     );
   }
 }

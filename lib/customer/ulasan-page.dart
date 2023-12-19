@@ -14,6 +14,7 @@ class Ulasan extends StatefulWidget {
 class _MyHomePageState extends State<Ulasan> {
   int _rating = 0;
   TextEditingController _reviewController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController(); // Controller untuk username
   Iterable<ImageFile> images = [];
   final controller = MultiImagePickerController(
     maxImages: 3,
@@ -22,24 +23,19 @@ class _MyHomePageState extends State<Ulasan> {
   );
   Future<void> _uploadImage() async {
     List<String> imageUrls = [];
-    // final images = controller.images; // Mengembalikan Iterable<ImageFile>
 
     for (final image in images) {
       Uint8List imageData;
 
       if (image.hasPath) {
-        // Membuat File dari path dan membaca sebagai bytes
         File file = File(image.path!);
         imageData = await file.readAsBytes();
       } else if (image.bytes != null) {
-        // Menggunakan data byte langsung
         imageData = image.bytes!;
       } else {
-        // Jika tidak ada path atau bytes, lanjutkan ke image berikutnya
         continue;
       }
 
-      // Proses upload imageData
       String fileName = 'image_/${DateTime.now().millisecondsSinceEpoch}.jpg';
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference ref = storage.ref().child(fileName);
@@ -53,13 +49,15 @@ class _MyHomePageState extends State<Ulasan> {
       });
     }
 
-    final CollectionReference mahasiswaCollection =
+    final CollectionReference ulasanCollection =
         FirebaseFirestore.instance.collection('ulasan');
 
-    mahasiswaCollection.add({
+    String username = _usernameController.text.trim(); // Mendapatkan username dari controller
+    ulasanCollection.add({
       'rating': _rating,
       'review': _reviewController.text.trim(),
       'fotoPaths': imageUrls,
+      'username': username, // Simpan username ke database
     }).then((DocumentReference idDocument) {
       print('Document added with ID: ${idDocument.id}');
       print('Foto Paths: $imageUrls');
@@ -69,10 +67,10 @@ class _MyHomePageState extends State<Ulasan> {
   }
 
   Stream<QuerySnapshot> readData() {
-    final mahasiswaStream =
-        FirebaseFirestore.instance.collection('mahasiswa').snapshots();
+    final ulasanStream =
+        FirebaseFirestore.instance.collection('ulasan').snapshots();
 
-    return mahasiswaStream;
+    return ulasanStream;
   }
 
   @override
@@ -182,6 +180,21 @@ class _MyHomePageState extends State<Ulasan> {
                         maxLines: 4,
                       ),
                     ),
+                    SizedBox(height: screenWidth * 0.05), // Spasi tambahan
+                    Container(
+                      width: screenWidth * 0.9,
+                      child: TextFormField(
+                        controller: _usernameController, // Input untuk username
+                        decoration: InputDecoration(
+                          labelText: 'Masukkan Username', // Label untuk username
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: screenWidth * 0.09,
+                            horizontal: screenWidth * 0.02,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -189,8 +202,7 @@ class _MyHomePageState extends State<Ulasan> {
               MultiImagePickerView(
                 onChange: (_) {
                   setState(() {
-                    images = controller
-                        .images; // Langsung tetapkan controller.images ke state
+                    images = controller.images;
                   });
                 },
                 controller: controller,

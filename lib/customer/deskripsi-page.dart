@@ -19,6 +19,9 @@ class DeskripsiMenu extends StatelessWidget {
 
             // Call the function to build the image with description
             buildImageWithDescription(context),
+
+            // Call the function to build text outside the image
+            buildTextOutsideImage(),
           ],
         ),
       ),
@@ -89,8 +92,8 @@ class DeskripsiMenu extends StatelessWidget {
 
   Widget buildTextOutsideImage() {
     return Positioned(
-      top: 20, // Adjust the top position as needed
-      left: 20, // Adjust the left position as needed
+      top: 20, // Sesuaikan posisi atas sesuai kebutuhan
+      left: 20, // Sesuaikan posisi kiri sesuai kebutuhan
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

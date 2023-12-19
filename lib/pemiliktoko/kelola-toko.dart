@@ -1,3 +1,7 @@
+import 'package:coffe_finder/pemiliktoko/data-toko.dart';
+import 'package:coffe_finder/pemiliktoko/buat-menu.dart';
+import 'package:coffe_finder/pemiliktoko/buat-promo.dart';
+import 'package:coffe_finder/pemiliktoko/foto-toko.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -39,6 +43,12 @@ class KelolaToko extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          BuatMenuPage()), // Navigate to TambahMenu
+                );
                 // Navigasi ke halaman Tambah Menu
               },
               style: ElevatedButton.styleFrom(
@@ -54,7 +64,7 @@ class KelolaToko extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Tambah Menu',
+                    'Buat Menu',
                     style: TextStyle(
                       fontSize: 17.0, // Ukuran font
                       fontWeight: FontWeight.bold, // Kekuatan font
@@ -69,6 +79,12 @@ class KelolaToko extends StatelessWidget {
             SizedBox(height: 20), // Menambahkan spasi antar tombol
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          BuatPromo()), // Navigate to TambahMenu
+                );
                 // Navigasi ke halaman Buat Promo
               },
               style: ElevatedButton.styleFrom(
@@ -98,6 +114,12 @@ class KelolaToko extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          FotoToko()), // Navigate to TambahMenu
+                );
                 // Navigasi ke halaman Tambahkan Foto Toko
               },
               style: ElevatedButton.styleFrom(
@@ -127,6 +149,12 @@ class KelolaToko extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Fasilitas()), // Navigate to TambahMenu
+                );
                 // Navigasi ke halaman Tambahkan Fasilitas & Jam Operasional
               },
               style: ElevatedButton.styleFrom(

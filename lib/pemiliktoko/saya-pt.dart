@@ -1,81 +1,6 @@
-import 'package:coffe_finder/customer/home-page.dart';
-import 'package:coffe_finder/pemiliktoko/dashboard-pt.dart';
 import 'package:flutter/material.dart';
-import 'package:coffe_finder/components/bottom_navigation_bar.dart'; // Import the new file
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Bottom Navigation Bar',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Akun(), // Ganti halaman utama dengan Akun()
-    );
-  }
-}
-
-class Akun extends StatefulWidget {
-  const Akun({Key? key}) : super(key: key);
-
-  @override
-  State<Akun> createState() => _AkunState();
-}
-
-class _AkunState extends State<Akun> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    BerandaPage(),
-    PromoList(),
-    SayaPage(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffF6F0E9),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-}
-
-// Halaman Beranda
-class BerandaPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Dashboard(),
-    );
-  }
-}
-
-class PromoList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: PromoPage(),
-    );
-  }
-}
-
-// Halaman Saya
-class SayaPage extends StatelessWidget {
+class PemilikTokoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +29,7 @@ class SayaPage extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 30,
                           backgroundImage:
-                              AssetImage('lib/images/profile-guest.png'),
+                              AssetImage('lib/images/starbucks.jpeg'),
                         ),
                       ),
                       Expanded(
@@ -113,18 +38,18 @@ class SayaPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Irvan Ronaldi',
+                              'Starbucks',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                             SizedBox(
-                              height: 15,
+                              height: 5,
                             ),
                             Text(
-                              'irvan@gmail.com',
+                              'Starbucks@gmail.com',
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white,
@@ -134,20 +59,13 @@ class SayaPage extends StatelessWidget {
                               height: 5,
                             ),
                             Text(
-                              'Customer',
+                              'Pemilik Toko',
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 29, 25, 0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -167,6 +85,14 @@ class SayaPage extends StatelessWidget {
                   indent: 20,
                   endIndent: 20,
                 ),
+                buildMenuItem(
+                    Icons.store, 'Kelola Toko'), // Ubah ikon menjadi bisnis
+                Divider(
+                  thickness: 1,
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
                 buildMenuItem(Icons.logout, 'Logout'),
                 Divider(
                   thickness: 1,
@@ -174,11 +100,41 @@ class SayaPage extends StatelessWidget {
                   indent: 20,
                   endIndent: 20,
                 ),
-                // Add other content as needed
+                // Tambahkan konten lain sesuai kebutuhan Anda
               ],
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex:
+            2, // Anda dapat mengganti nilai ini sesuai halaman saat ini
+        selectedItemColor:
+            Colors.black, // Warna item yang dipilih menjadi hitam
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Beranda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer),
+            label: 'Promo',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Saya',
+          ),
+        ],
+        onTap: (index) {
+          // Tambahkan logika untuk mengubah halaman berdasarkan index yang dipilih
+          if (index == 0) {
+            // Navigasi ke halaman "Beranda"
+          } else if (index == 1) {
+            // Navigasi ke halaman "Promo"
+          } else if (index == 2) {
+            // Navigasi ke halaman "Saya"
+          }
+        },
       ),
     );
   }
@@ -186,7 +142,7 @@ class SayaPage extends StatelessWidget {
   Widget buildMenuItem(IconData icon, String title) {
     return InkWell(
       onTap: () {
-        // Logic when menu item is pressed
+        // Logika ketika item menu ditekan
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -205,6 +161,20 @@ class SayaPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My App',
+      home: PemilikTokoPage(),
     );
   }
 }

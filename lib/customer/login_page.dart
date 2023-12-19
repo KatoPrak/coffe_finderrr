@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coffe_finder/customer/edit-profile_page.dart';
 import 'package:coffe_finder/customer/home-page.dart';
 import 'package:coffe_finder/customer/register_page.dart';
+import 'package:coffe_finder/customer/tentang-cafe.dart';
+import 'package:coffe_finder/pemiliktoko/dashboard-pt.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coffe_finder/customer/forgot_page.dart';
 import 'package:coffe_finder/components/my_textfield.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -17,7 +22,6 @@ class _LoginPageState extends State<LoginPage> {
   // text controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _passwordVisible = false;
 
   Future signIn() async {
     String email = _emailController.text.trim();
@@ -25,42 +29,115 @@ class _LoginPageState extends State<LoginPage> {
 
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        // Jika login berhasil, navigasikan ke halaman home_page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CourseScreen(),
-          ),
-        );
+        User user = userCredential.user!;
+        String userEmail = user.email!;
+        String userRole = await getUserRole(userEmail);
+
+        if (userRole == 'Pelanggan') {
+          print(user);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Dashboard(),
+            ),
+          );
+        } else if (userRole == 'Pemilik Toko') {
+          print(user);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const DashboardScreen(),
+            ),
+          );
+        }
       } catch (e) {
-        // Handle kesalahan login di sini, misalnya menampilkan pesan kesalahan
+        // Menampilkan notifikasi login gagal
         print("Error during login: $e");
-        // Tambahkan logika atau notifikasi tambahan jika diperlukan
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
+                  SizedBox(width: 5),
+                  Text('Login Gagal'),
+                ],
+              ),
+              content: const Text('Email dan Password Salah!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Tutup notifikasi
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
     } else {
-      // Jika formulir tidak lengkap, tampilkan notifikasi
+      // Menampilkan notifikasi form tidak boleh kosong
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Peringatan'),
-            content: Text('Email dan password harus diisi.'),
+            title: const Row(
+              children: [
+                Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                SizedBox(width: 5),
+                Text('Peringatan'),
+              ],
+            ),
+            content: const Text('Email dan Password Tidak Boleh Kosong!'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Tutup notifikasi
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
         },
       );
+    }
+  }
+
+  Future<String> getUserRole(String email) async {
+    try {
+      // Lakukan query ke Firestore atau sumber data lainnya untuk mendapatkan data pengguna
+      // Misalnya, kita memiliki koleksi 'users' dengan dokumen berisi informasi peran ('role') pengguna
+      QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (usersSnapshot.docs.isNotEmpty) {
+        // Ambil nilai peran dari dokumen pertama (sebagai contoh, Anda bisa menambahkan logika lebih lanjut sesuai kebutuhan)
+        String userRole = usersSnapshot.docs.first.get('role');
+        return userRole;
+      } else {
+        // Handle jika dokumen tidak ditemukan
+        return 'unknown'; // atau berikan nilai default yang sesuai
+      }
+    } catch (e) {
+      // Handle error jika terjadi kesalahan saat mengambil data dari Firestore
+      print("Error fetching user role: $e");
+      return 'unknown'; // atau berikan nilai default yang sesuai
     }
   }
 
@@ -100,26 +177,14 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _passwordController,
               hintText: 'Password',
-              obscureText: !_passwordVisible,
-              suffixIcon: IconButton(
-                color: Colors.brown,
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _passwordVisible = !_passwordVisible;
-                  });
-                },
-              ),
+              obscureText: true,
             ),
-
             const SizedBox(height: 15),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -235,7 +300,7 @@ class _AnimatedButtonState extends State<AnimatedButton> {
       _scale = 0.95;
     });
 
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _scale = 1.0;
       });

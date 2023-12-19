@@ -1,3 +1,4 @@
+import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -842,7 +843,6 @@ class _AboutCafeState extends State<AboutCafe>
                                   ],
                                 ),
                               );
-                              5;
                             }).toList(),
                           ),
                         ],

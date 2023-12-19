@@ -29,8 +29,6 @@ class BuatPromo extends StatefulWidget {
 class _BuatPromoState extends State<BuatPromo> {
   final TextEditingController promoDescriptionController =
       TextEditingController();
-  TextEditingController monTimeController = TextEditingController();
-  TextEditingController tueTimeController = TextEditingController();
   // ... Ulangi untuk setiap hari hingga Minggu
 
   Iterable<ImageFile> images = [];
@@ -45,17 +43,6 @@ class _BuatPromoState extends State<BuatPromo> {
     // ... (Implementasi seperti sebelumnya)
   }
 
-  Future<void> _selectTime(
-      BuildContext context, TextEditingController controller) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && picked != TimeOfDay.now()) {
-      controller.text = picked.format(context);
-    }
-  }
-
   Widget _buildTimeField(String day, TextEditingController controller) {
     return Column(
       children: [
@@ -67,8 +54,6 @@ class _BuatPromoState extends State<BuatPromo> {
             labelText: 'Waktu Buka $day',
             suffixIcon: Icon(Icons.access_time),
           ),
-          readOnly: true,
-          onTap: () => _selectTime(context, controller),
         ),
       ],
     );
@@ -92,10 +77,7 @@ class _BuatPromoState extends State<BuatPromo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: 30.0),
-            Text('Tentang Promo',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20.0),
+            SizedBox(height: 50.0),
             TextField(
               controller: promoDescriptionController,
               decoration: InputDecoration(
@@ -106,12 +88,9 @@ class _BuatPromoState extends State<BuatPromo> {
               ),
               maxLines: 5,
             ),
-            _buildTimeField('Senin', monTimeController),
-            _buildTimeField('Selasa', tueTimeController),
-            // ... Ulangi untuk setiap hari hingga Minggu
             SizedBox(height: 50.0),
             Text('Gambar Produk',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
             SizedBox(height: 8.0),
             MultiImagePickerView(
               onChange: (_) {

@@ -1,72 +1,179 @@
 import 'package:flutter/material.dart';
-import 'package:coffe_finder/model/model.dart'; // Pastikan path ini benar untuk model Toko Anda
+import 'package:google_fonts/google_fonts.dart';
 
-class PromoPage extends StatelessWidget {
-  final List<Toko> listToko = [
-    // Tambahkan data Toko di sini atau dapatkan dari database/model Anda
-  ];
+
+class PromoPage1 extends StatefulWidget {
+  const PromoPage1({Key? key}) : super(key: key);
+
+  @override
+  State<PromoPage1> createState() => _PromoPageState();
+}
+
+class _PromoPageState extends State<PromoPage1> {
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Promo'),
+        toolbarHeight: 65,
+        title: Text(
+          "Promo",
+          style: GoogleFonts.montserrat(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Set the text color to white
+          ),
+        ),
+        backgroundColor: Color(0xFF804A20), // Set the app bar color
+        elevation: 0,
       ),
-      body: ListView.builder(
-        itemCount: listToko.length,
-        itemBuilder: (context, index) {
-          Toko toko = listToko[index];
-          return PromoCard(toko: toko);
-        },
-      ),
+      body: PromoList(),
     );
   }
 }
 
-class PromoCard extends StatelessWidget {
-  final Toko toko;
+// Halaman Promo (Dibuat sebagai widget terpisah untuk memudahkan)
+class PromoList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 10,
+              top: 10,
+              left: 10,
+              right: 10,
+            ), // Tambahkan jarak atas dan bawah
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(
+                Radius.circular(25), // Border radius kanan bawah
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color.fromARGB(
+                        255, 170, 170, 170), // Warna garis pinggir
+                    width: 2.0, // Lebar garis pinggir
+                  ),
+                ),
+                child: Image.asset(
+                  "lib/images/ilustrasii.jpg",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding:
+                const EdgeInsets.all(10), // Tambahkan jarak 10 pada semua sisi
+            child: Text(
+              "Daftar Promo seru ☕️",
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildListDelegate(
+            <Widget>[
+              Promo(
+                imagePromo: "lib/images/ilustrasi.jpg",
+                nameToko: "Kopi Kenangan",
+                namePromo: "Beli 2 Gratis 1",
+                idPromo: "1",
+              ),
+              Promo(
+                imagePromo: "lib/images/promo1.jpeg",
+                nameToko: "Toko Kenanganku",
+                namePromo: "Promo spesial Weekend",
+                idPromo: "2",
+              ),
+              Promo(
+                imagePromo: "lib/images/promo2.webp",
+                nameToko: "Starbucks",
+                namePromo: "Beli 1 Gratis 1",
+                idPromo: "3",
+              ),
+              SizedBox(height: 20), // Tambahkan jarak vertikal sebesar 20
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-  const PromoCard({Key? key, required this.toko}) : super(key: key);
+class Promo extends StatelessWidget {
+  final String imagePromo;
+  final String nameToko;
+  final String namePromo;
+  final String idPromo;
+
+  const Promo({
+    Key? key,
+    required this.imagePromo,
+    required this.nameToko,
+    required this.namePromo,
+    required this.idPromo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        // Aksi ketika card di-tap. Contoh: navigasi ke detail halaman.
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailPage(toko: toko)),
-        );
+        // Tambahkan tindakan yang ingin diambil ketika item promo diklik di sini
+        // Contoh: Navigasi ke halaman detail promo
       },
       child: Card(
-        elevation: 4.0,
-        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: ListTile(
-          leading: Image.asset(toko.imageToko, width: 100, height: 100, fit: BoxFit.cover),
-          title: Text(toko.nameToko),
-          subtitle: Text(toko.descriptionMenu),
-          trailing: Text('Rp${toko.price.toString()}'),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        margin: const EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
-      ),
-    );
-  }
-}
-
-// Contoh halaman detail yang mungkin ingin Anda navigasi
-class DetailPage extends StatelessWidget {
-  final Toko toko;
-
-  const DetailPage({Key? key, required this.toko}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(toko.nameToko),
-      ),
-      body: Center(
-        child: Text('Detail dari ${toko.nameToko}'),
-        // Anda bisa menambahkan lebih banyak informasi toko di sini
+        elevation: 10,
+        child: Column(
+          children: [
+            Image.asset(
+              imagePromo,
+              width: double.infinity,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Align(
+                alignment:
+                    Alignment.centerLeft, // Posisikan teks ke kiri (start)
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nameToko,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      namePromo,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

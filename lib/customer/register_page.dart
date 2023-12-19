@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:coffe_finder/customer/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coffe_finder/components/my_textfield.dart';
 import 'package:coffe_finder/components/my_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:crypto/crypto.dart';
 
 String selectedRole = 'Pilih Role';
 
@@ -23,7 +27,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
-  bool _passwordVisible = false;
 
   @override
   void dispose() {
@@ -46,7 +49,19 @@ class _RegisterPageState extends State<RegisterPage> {
         await saveUserData(
           _usernameController.text.trim(),
           _emailController.text.trim(),
+          _passwordController.text.trim(),
           selectedRole,
+        );
+
+        // Display a success message for successful registration
+        Fluttertoast.showToast(
+          msg: "Registrasi berhasil!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
 
         // Navigate to the login page after successful registration
@@ -61,19 +76,36 @@ class _RegisterPageState extends State<RegisterPage> {
       } catch (e) {
         // Display an error message for registration failure
         print("Error during registration: $e");
+        Fluttertoast.showToast(
+          msg: "Gagal melakukan registrasi. Silakan coba lagi.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       }
     }
   }
 
-  Future<void> saveUserData(String username, String email, String role) async {
+  Future<void> saveUserData(
+      String username, String email, String password, String role) async {
     try {
-      // Assuming you have a Firestore instance
+      // Generate a random salt for each user
+      const String salt = "generate_random_salt_here";
+
+      // Encrypt the password with salt using SHA-256
+      final String hashedPassword =
+          sha256.convert(utf8.encode("$password$salt")).toString();
+
       final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
       // Save user data to the "users" collection
       await firestore.collection('users').doc(email).set({
         'username': username,
         'email': email,
+        'password': hashedPassword,
         'role': role,
       });
     } catch (e) {
@@ -86,19 +118,28 @@ class _RegisterPageState extends State<RegisterPage> {
         _emailController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty ||
         _confirmpasswordController.text.trim().isEmpty) {
-      // Tampilkan notifikasi jika ada form yang kosong
+      // Show a notification if any form field is empty
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Peringatan'),
-            content: Text('Semua formulir harus diisi.'),
+            title: const Row(
+              children: [
+                Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                SizedBox(width: 5),
+                Text('Peringatan'),
+              ],
+            ),
+            content: const Text('Semua Formulir Harus diisi!'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Tutup notifikasi
+                  Navigator.of(context).pop(); // Close the notification
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -106,19 +147,28 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return false;
     } else if (!passwordConfirmed()) {
-      // Tampilkan notifikasi jika password tidak sesuai
+      // Show a notification if password and confirm password don't match
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Peringatan'),
-            content: Text('Password dan konfirmasi password harus sama.'),
+            title: const Row(
+              children: [
+                Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                SizedBox(width: 5),
+                Text('Peringatan'),
+              ],
+            ),
+            content: const Text('Password dan Konfirmasi Password Harus Sama!'),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Tutup notifikasi
+                  Navigator.of(context).pop(); // Close the notification
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -172,18 +222,7 @@ class _RegisterPageState extends State<RegisterPage> {
             MyTextField(
               controller: _passwordController,
               hintText: 'Password',
-              obscureText: !_passwordVisible,
-              suffixIcon: IconButton(
-                color: Colors.brown,
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _passwordVisible = !_passwordVisible;
-                  });
-                },
-              ),
+              obscureText: true,
             ),
             const SizedBox(height: 42),
 
@@ -191,18 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
             MyTextField(
               controller: _confirmpasswordController,
               hintText: 'Konfirmasi Password',
-              obscureText: !_passwordVisible,
-              suffixIcon: IconButton(
-                color: Colors.blue,
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _passwordVisible = !_passwordVisible;
-                  });
-                },
-              ),
+              obscureText: true,
             ),
             const SizedBox(height: 42),
 
@@ -228,7 +256,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   'Sudah Punya Akun?',
                   style: TextStyle(color: Color.fromARGB(255, 97, 97, 97)),
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -312,7 +340,7 @@ class _AnimatedButtonState extends State<AnimatedButton> {
       _scale = 0.95;
     });
 
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _scale = 1.0;
       });
