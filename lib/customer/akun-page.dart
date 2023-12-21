@@ -1,24 +1,10 @@
-import 'package:coffe_finder/customer/home-page.dart';
-import 'package:coffe_finder/pemiliktoko/dashboard-pt.dart';
+import 'package:coffe_finder/auth/auth_page.dart';
+import 'package:coffe_finder/customer/edit-profile_page.dart';
+import 'package:coffe_finder/customer/forgot_page.dart';
 import 'package:flutter/material.dart';
-import 'package:coffe_finder/components/bottom_navigation_bar.dart'; // Import the new file
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Bottom Navigation Bar',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Akun(), // Ganti halaman utama dengan Akun()
-    );
-  }
-}
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Akun extends StatefulWidget {
   const Akun({Key? key}) : super(key: key);
@@ -28,54 +14,38 @@ class Akun extends StatefulWidget {
 }
 
 class _AkunState extends State<Akun> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    BerandaPage(),
-    PromoList(),
-    SayaPage(),
-  ];
+  String username = '';
+  String userEmail = '';
+  String userRole = '';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffF6F0E9),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
-    );
+  void initState() {
+    super.initState();
+    loadUserData();
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-}
+  void loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
-// Halaman Beranda
-class BerandaPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Dashboard(),
-    );
-  }
-}
+      if (user != null) {
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.email)
+            .get();
 
-class PromoList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: PromoPage(),
-    );
+        setState(() {
+          username = userDoc['username'] ?? '';
+          userEmail = user.email ?? '';
+          userRole = userDoc['role'] ?? '';
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
   }
-}
 
-// Halaman Saya
-class SayaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,33 +82,56 @@ class SayaPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Irvan Ronaldi',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  '$username',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontFamily: 'Rubik',
+                                    letterSpacing: 1.2,
+                                    // gaya teks
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(
-                              height: 15,
+                              height: 13,
                             ),
-                            Text(
-                              'irvan@gmail.com',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                            Row(
+                              children: [
+                                Text(
+                                  '$userEmail',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontFamily: 'Rubik',
+                                    letterSpacing: 1.2,
+                                    // gaya teks
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(
-                              height: 5,
+                              height: 13,
                             ),
-                            Text(
-                              'Customer',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                            Row(
+                              children: [
+                                Text(
+                                  '$userRole',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontFamily: 'Rubik',
+                                    letterSpacing: 1.2,
+                                    // gaya teks
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -160,21 +153,57 @@ class SayaPage extends StatelessWidget {
                   indent: 20,
                   endIndent: 20,
                 ),
-                buildMenuItem(Icons.settings, 'Pengaturan'),
+                buildMenuItem(Icons.edit, 'Edit Profile', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profile(),
+                    ),
+                  );
+                }),
                 Divider(
                   thickness: 1,
                   color: Colors.grey,
                   indent: 20,
                   endIndent: 20,
                 ),
-                buildMenuItem(Icons.logout, 'Logout'),
+                buildMenuItem(Icons.lock, 'Ubah Password', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ForgotPass(),
+                    ),
+                  );
+                }),
                 Divider(
                   thickness: 1,
                   color: Colors.grey,
                   indent: 20,
                   endIndent: 20,
                 ),
-                // Add other content as needed
+                buildMenuItem(Icons.info, 'Tentang', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profile(),
+                    ),
+                  );
+                }),
+                Divider(
+                  thickness: 1,
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                buildMenuItem(Icons.logout, 'Logout', () {
+                  _showLogoutConfirmationDialog(context);
+                }),
+                Divider(
+                  thickness: 1,
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
               ],
             ),
           ),
@@ -183,11 +212,44 @@ class SayaPage extends StatelessWidget {
     );
   }
 
-  Widget buildMenuItem(IconData icon, String title) {
-    return InkWell(
-      onTap: () {
-        // Logic when menu item is pressed
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(
+                Icons.error,
+                color: Colors.red,
+              ),
+              SizedBox(width: 5),
+              Text('Peringatan'),
+            ],
+          ),
+          content: Text('Apakah Anda yakin ingin logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _signOut(context);
+              },
+              child: Text('Logout'),
+            ),
+          ],
+        );
       },
+    );
+  }
+
+  Widget buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: Row(
@@ -204,6 +266,26 @@ class SayaPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    await _auth.signOut();
+    print('Logout berhasil!');
+    Fluttertoast.showToast(
+      msg: 'Logout berhasil!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 3,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthPage(),
       ),
     );
   }

@@ -14,7 +14,8 @@ class Ulasan extends StatefulWidget {
 class _MyHomePageState extends State<Ulasan> {
   int _rating = 0;
   TextEditingController _reviewController = TextEditingController();
-  TextEditingController _usernameController = TextEditingController(); // Controller untuk username
+  TextEditingController _usernameController =
+      TextEditingController(); // Controller untuk username
   Iterable<ImageFile> images = [];
   final controller = MultiImagePickerController(
     maxImages: 3,
@@ -52,7 +53,8 @@ class _MyHomePageState extends State<Ulasan> {
     final CollectionReference ulasanCollection =
         FirebaseFirestore.instance.collection('ulasan');
 
-    String username = _usernameController.text.trim(); // Mendapatkan username dari controller
+    String username =
+        _usernameController.text.trim(); // Mendapatkan username dari controller
     ulasanCollection.add({
       'rating': _rating,
       'review': _reviewController.text.trim(),
@@ -181,20 +183,6 @@ class _MyHomePageState extends State<Ulasan> {
                       ),
                     ),
                     SizedBox(height: screenWidth * 0.05), // Spasi tambahan
-                    Container(
-                      width: screenWidth * 0.9,
-                      child: TextFormField(
-                        controller: _usernameController, // Input untuk username
-                        decoration: InputDecoration(
-                          labelText: 'Masukkan Username', // Label untuk username
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: screenWidth * 0.09,
-                            horizontal: screenWidth * 0.02,
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

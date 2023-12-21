@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -617,6 +617,13 @@ class AboutCafe extends StatefulWidget {
 
 class _AboutCafeState extends State<AboutCafe>
     with SingleTickerProviderStateMixin {
+  Stream<QuerySnapshot> readData() {
+    final ulasanStream =
+        FirebaseFirestore.instance.collection('datatoko').snapshots();
+
+    return ulasanStream;
+  }
+
   final myitems = [
     'lib/images/kopicatcafebyGroovy/dekorasi/1.jpg',
     'lib/images/kopicatcafebyGroovy/dekorasi/2.jpg',

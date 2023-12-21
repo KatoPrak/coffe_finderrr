@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coffe_finder/customer/edit-profile_page.dart';
-import 'package:coffe_finder/customer/home-page.dart';
+import 'package:coffe_finder/components/bottom_navigation_bar.dart';
+import 'package:coffe_finder/components/navbar-toko.dart';
 import 'package:coffe_finder/customer/register_page.dart';
 import 'package:coffe_finder/customer/tentang-cafe.dart';
-import 'package:coffe_finder/pemiliktoko/dashboard-pt.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coffe_finder/customer/forgot_page.dart';
@@ -22,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   // text controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _passwordVisible = false;
 
   Future signIn() async {
     String email = _emailController.text.trim();
@@ -44,16 +44,35 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Dashboard(),
+              builder: (context) => BottomNavBarDemo(),
             ),
+          );
+          print('Login berhasil!');
+          Fluttertoast.showToast(
+            msg: "Login berhasil!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
           );
         } else if (userRole == 'Pemilik Toko') {
           print(user);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const DashboardScreen(),
+              builder: (context) => BottomNavBarToko(),
             ),
+          );
+          Fluttertoast.showToast(
+            msg: "Login berhasil!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
           );
         }
       } catch (e) {
@@ -177,7 +196,18 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _passwordController,
               hintText: 'Password',
-              obscureText: true,
+              obscureText: !_passwordVisible,
+              suffixIcon: IconButton(
+                color: Colors.brown,
+                icon: Icon(
+                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _passwordVisible = !_passwordVisible;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 15),
 

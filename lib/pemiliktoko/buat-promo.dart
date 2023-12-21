@@ -27,9 +27,7 @@ class BuatPromo extends StatefulWidget {
 }
 
 class _BuatPromoState extends State<BuatPromo> {
-  final TextEditingController promoDescriptionController =
-      TextEditingController();
-  // ... Ulangi untuk setiap hari hingga Minggu
+  final TextEditingController judulPromoController = TextEditingController();
 
   Iterable<ImageFile> images = [];
   MultiImagePickerController controller = MultiImagePickerController(
@@ -40,23 +38,68 @@ class _BuatPromoState extends State<BuatPromo> {
   bool isUploading = false;
 
   Future<void> _uploadImage() async {
-    // ... (Implementasi seperti sebelumnya)
-  }
+    // Validate input fields
+    if (judulPromoController.text.isEmpty || images.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Harap isi judul promo dan pilih gambar produk!')),
+      );
+      return;
+    }
 
-  Widget _buildTimeField(String day, TextEditingController controller) {
-    return Column(
-      children: [
-        SizedBox(height: 10.0),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Waktu Buka $day',
-            suffixIcon: Icon(Icons.access_time),
-          ),
-        ),
-      ],
-    );
+    // Upload the image
+    if (images.isNotEmpty) {
+      final ImageFile image = images.first;
+      Uint8List imageData;
+
+      if (image.hasPath) {
+        File file = File(image.path!);
+        imageData = await file.readAsBytes();
+      } else if (image.bytes != null) {
+        imageData = image.bytes!;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengunggah gambar!')),
+        );
+        return;
+      }
+
+      try {
+        String fileName = 'image_/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref = storage.ref().child(fileName);
+
+        UploadTask uploadTask = ref.putData(imageData);
+        await uploadTask.whenComplete(() async {
+          String imageUrl = await ref.getDownloadURL();
+
+          // Save promo data to Firestore
+          final CollectionReference promoCollection =
+              FirebaseFirestore.instance.collection('promo');
+
+          await promoCollection.add({
+            'judul': judulPromoController.text,
+            'gambar': imageUrl,
+            // Add more fields as needed
+          });
+
+          // Clear input fields
+          judulPromoController.clear();
+          controller.clearImages();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Promo berhasil diunggah!')),
+          );
+        }).catchError((onError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error uploading image: $onError')),
+          );
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -79,14 +122,12 @@ class _BuatPromoState extends State<BuatPromo> {
           children: <Widget>[
             SizedBox(height: 50.0),
             TextField(
-              controller: promoDescriptionController,
+              controller: judulPromoController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Isi Deskripsi',
-                hintText: 'Tambahkan deskripsi promo di sini...',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+                labelText: 'Judul Promo',
+                hintText: 'Masukkan Judul Promo',
               ),
-              maxLines: 5,
             ),
             SizedBox(height: 50.0),
             Text('Gambar Produk',

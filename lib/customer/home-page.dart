@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coffe_finder/customer/tentang-cafe.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Toko {
   String nameToko;
   String alamat;
   double rating; // Tipe data rating diubah menjadi double
-  String imageToko;
+  String? imageToko;
   List<Produk> produkList;
+  final String guestProfilePhoto;
 
   Toko({
     required this.nameToko,
@@ -14,6 +17,7 @@ class Toko {
     required this.rating,
     required this.imageToko,
     required this.produkList,
+    required this.guestProfilePhoto,
   });
 }
 
@@ -35,29 +39,15 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<Dashboard> {
+  String username = '';
   List<Toko> terdekat = [
     Toko(
       nameToko: 'Starbucks',
       alamat: 'Jl. Contoh No. 123',
       rating: 5.0, // Rating diubah menjadi double
-      imageToko: 'lib/images/starbucks.jpeg',
-      produkList: [
-        Produk(
-          nama: 'Kopi Espresso',
-          harga: 25.0,
-          imageToko: 'lib/images/RimbunKopi/Karolina.jpg',
-        ),
-        Produk(
-          nama: 'Cappuccino',
-          harga: 30.0,
-          imageToko: 'lib/images/LoonamiHouse/Bananauyu.jpg',
-        ),
-        Produk(
-          nama: 'Latte',
-          harga: 28.0,
-          imageToko: 'lib/images/RimbunKopi/Caffelatte.jpg',
-        ),
-      ],
+      imageToko: null,
+      guestProfilePhoto: 'lib/images/profile-guest.png',
+      produkList: [],
     ),
     // Tambahkan data toko lainnya di sini
   ];
@@ -91,10 +81,28 @@ class _DashboardScreenState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    loadUserData();
     filteredToko = terdekat;
     searchController.addListener(() {
       searchShop(searchController.text);
     });
+  }
+  void loadUserData() async {
+    try {
+      // Gantilah 'userEmail' dengan email pengguna yang saat ini login
+      final userEmail = FirebaseAuth.instance.currentUser?.email;
+
+      if (userEmail != null) {
+        final DocumentSnapshot userDoc =
+            await FirebaseFirestore.instance.collection('users').doc(userEmail).get();
+
+        setState(() {
+          username = userDoc['username'];
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
   }
 
   @override
@@ -122,7 +130,8 @@ class _DashboardScreenState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 60,
+        toolbarHeight: 65,
+        automaticallyImplyLeading: false,
         backgroundColor: Color(0xFF804A20),
         title: Text(
           'Coffee Finder',
@@ -135,7 +144,7 @@ class _DashboardScreenState extends State<Dashboard> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(Icons.search),
             iconSize: 32,
             onPressed: () {
               showSearch(
@@ -162,7 +171,7 @@ class _DashboardScreenState extends State<Dashboard> {
               ),
             ),
             Text(
-              'Irvan Ronaldi',
+              '$username',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -172,8 +181,13 @@ class _DashboardScreenState extends State<Dashboard> {
             SizedBox(
               height: 30,
             ),
-            Image.asset(
-              'lib/images/welcome.jpg', // Adjust the image width as needed
+            ClipRRect(
+              borderRadius: BorderRadius.circular(
+                  16.0), // Sesuaikan dengan radius yang Anda inginkan
+              child: Image.asset(
+                'lib/images/welcome.jpg',
+                fit: BoxFit.cover, // Sesuaikan dengan lebar yang Anda inginkan
+              ),
             ),
             SizedBox(
               height: 40,
@@ -196,25 +210,64 @@ class _DashboardScreenState extends State<Dashboard> {
                   var shop = filteredToko[index];
                   return Padding(
                     padding: const EdgeInsets.all(5.0), // Add padding here
-                    child: ListTile(
-                      title: Text(shop.nameToko),
-                      subtitle: Text(shop.alamat),
-                      leading: Container(
-                        height: 80,
-                        width: 80,
-                        child: Image.asset(
-                          shop.imageToko,
-                          fit: BoxFit.cover,
+                    child: Container(
+                      height: 90,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xFF000000)
+                              .withOpacity(0.2), // Ubah warna border di sini
                         ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xFFF2F2F2),
                       ),
-                      trailing: buildStarRating(shop.rating),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => AboutCafe(),
+                      child: ListTile(
+                        title: Text(
+                          shop.nameToko,
+                          style: TextStyle(
+                            fontSize: 18.0, // Atur ukuran teks sesuai kebutuhan
+                            fontWeight: FontWeight
+                                .bold, // Atur gaya teks sesuai kebutuhan
                           ),
-                        );
-                      },
+                        ),
+                        subtitle: Text(
+                          shop.alamat,
+                          style: TextStyle(
+                            fontSize: 16.0, // Atur ukuran teks sesuai kebutuhan
+                          ),
+                        ),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: Image.asset(
+                            shop.imageToko ?? 'lib/images/profile-guest.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize
+                              .min, // To make sure the icons are centered
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: Color(0xFFE4A70A),
+                            ),
+                            Text(
+                              shop.rating
+                                  .toString(), // Assuming rating is a double or int
+                              style: TextStyle(
+                                fontSize:
+                                    16.0, // Atur ukuran teks sesuai kebutuhan
+                              ),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => AboutCafe(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   );
                 },
@@ -285,26 +338,64 @@ class CoffeeShopSearchDelegate extends SearchDelegate {
       itemBuilder: (context, index) {
         var shop = matchingShops[index];
         return Padding(
-          padding: const EdgeInsets.all(8.0), // Add padding here
-          child: ListTile(
-            title: Text(shop.nameToko),
-            subtitle: Text(shop.alamat),
-            leading: Container(
-              height: 80,
-              width: 80,
-              child: Image.asset(
-                shop.imageToko,
-                fit: BoxFit.cover,
+          padding: const EdgeInsets.all(5.0), // Add padding here
+          child: Container(
+            height: 90,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xFF000000)
+                    .withOpacity(0.2), // Ubah warna border di sini
               ),
+              borderRadius: BorderRadius.circular(10),
+              color: Color(0xFFF2F2F2),
             ),
-            trailing: buildStarRating(shop.rating),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => DetailScreen(
-                  toko: shop,
+            child: ListTile(
+              title: Text(
+                shop.nameToko,
+                style: TextStyle(
+                  fontSize: 18.0, // Atur ukuran teks sesuai kebutuhan
+                  fontWeight:
+                      FontWeight.bold, // Atur gaya teks sesuai kebutuhan
                 ),
-              ));
-            },
+              ),
+              subtitle: Text(
+                shop.alamat,
+                style: TextStyle(
+                  fontSize: 16.0, // Atur ukuran teks sesuai kebutuhan
+                ),
+              ),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(40),
+                child: Image.asset(
+                  shop.imageToko ?? 'lib/images/profile-guest.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              trailing: Row(
+                mainAxisSize:
+                    MainAxisSize.min, // To make sure the icons are centered
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: Color(0xFFE4A70A),
+                  ),
+                  Text(
+                    shop.rating
+                        .toString(), // Assuming rating is a double or int
+                    style: TextStyle(
+                      fontSize: 16.0, // Atur ukuran teks sesuai kebutuhan
+                    ),
+                  ),
+                ],
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AboutCafe(),
+                  ),
+                );
+              },
+            ),
           ),
         );
       },
@@ -315,69 +406,4 @@ class CoffeeShopSearchDelegate extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     return buildResults(context);
   }
-}
-
-class DetailScreen extends StatelessWidget {
-  final Toko toko;
-
-  const DetailScreen({Key? key, required this.toko}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(toko.nameToko),
-      ),
-      body: Column(
-        children: [
-          Image.asset(
-            toko.imageToko,
-            fit: BoxFit.cover,
-            height: 200,
-          ),
-          Text(toko.alamat),
-          Text(
-              'Rating: ${toko.rating.toStringAsFixed(1)}'), // Format rating dengan 1 desimal
-          SizedBox(height: 10),
-          Text('Nama Toko: ${toko.nameToko}'),
-          SizedBox(height: 20),
-          Text('Produk di ${toko.nameToko}'),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: toko.produkList.length,
-              itemBuilder: (BuildContext context, int index) {
-                final produk = toko.produkList[index];
-                return Card(
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        produk.imageToko,
-                        fit: BoxFit.cover,
-                        height: 80,
-                        width: 80,
-                      ),
-                      Text(produk.nama),
-                      Text("${produk.harga}"),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Dashboard(),
-  ));
 }

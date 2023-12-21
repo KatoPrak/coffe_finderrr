@@ -1,3 +1,7 @@
+import 'package:coffe_finder/auth/auth_page.dart';
+import 'package:coffe_finder/customer/home-page.dart';
+import 'package:coffe_finder/customer/promo-page.dart';
+import 'package:coffe_finder/pemiliktoko/buat-promo.dart';
 import 'package:coffe_finder/pemiliktoko/data-toko.dart';
 import 'package:coffe_finder/splash.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DataToko(),
+      home: AuthPage(),
     );
   }
 }

@@ -49,14 +49,6 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int rating = 3; // Ganti dengan nilai rating yang sesuai
-  int _selectedIndex = 0; // Indeks terpilih pada Bottom Navigation Bar
-
-  // Fungsi untuk mengubah indeks terpilih pada Bottom Navigation Bar
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,45 +230,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      // Menambahkan Bottom Navigation Bar
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
-    );
-  }
-}
-
-class BottomNavBar extends StatelessWidget {
-  final int selectedIndex;
-  final void Function(int) onItemTapped;
-
-  const BottomNavBar({
-    Key? key,
-    required this.selectedIndex,
-    required this.onItemTapped,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Beranda',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.local_offer),
-          label: 'Promo',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Saya',
-        ),
-      ],
-      currentIndex: selectedIndex,
-      selectedItemColor: Colors.black,
-      onTap: onItemTapped,
     );
   }
 }

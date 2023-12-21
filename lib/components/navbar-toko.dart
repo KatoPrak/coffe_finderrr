@@ -1,6 +1,6 @@
-import 'package:coffe_finder/customer/akun-page.dart';
-import 'package:coffe_finder/customer/home-page.dart';
 import 'package:coffe_finder/customer/promo-page.dart';
+import 'package:coffe_finder/pemiliktoko/dashboard-pt.dart';
+import 'package:coffe_finder/pemiliktoko/saya-pt.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,23 +11,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: BottomNavBarDemo(),
+      home: BottomNavBarToko(),
     );
   }
 }
 
-class BottomNavBarDemo extends StatefulWidget {
+class BottomNavBarToko extends StatefulWidget {
   @override
-  _BottomNavBarDemoState createState() => _BottomNavBarDemoState();
+  _BottomNavBarTokoState createState() => _BottomNavBarTokoState();
 }
 
-class _BottomNavBarDemoState extends State<BottomNavBarDemo> {
+class _BottomNavBarTokoState extends State<BottomNavBarToko> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
     BerandaPage(),
     PromoPage(),
-    Akun(),
+    PemilikTokoPage1(),
   ];
 
   @override
@@ -66,7 +66,7 @@ class BerandaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Dashboard(),
+      child: DashboardScreen(),
     );
   }
 }
@@ -80,11 +80,11 @@ class PromoPage extends StatelessWidget {
   }
 }
 
-class Akun1 extends StatelessWidget {
+class PemilikTokoPage1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Akun(),
+      child: PemilikTokoPage(),
     );
   }
 }

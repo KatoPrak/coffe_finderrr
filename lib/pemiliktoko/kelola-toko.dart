@@ -1,7 +1,6 @@
 import 'package:coffe_finder/pemiliktoko/data-toko.dart';
 import 'package:coffe_finder/pemiliktoko/buat-menu.dart';
 import 'package:coffe_finder/pemiliktoko/buat-promo.dart';
-import 'package:coffe_finder/pemiliktoko/foto-toko.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -118,7 +117,7 @@ class KelolaToko extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          FotoToko()), // Navigate to TambahMenu
+                          DataToko()), // Navigate to TambahMenu
                 );
                 // Navigasi ke halaman Tambahkan Foto Toko
               },
@@ -135,42 +134,7 @@ class KelolaToko extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Tambahkan Foto Toko',
-                    style: TextStyle(
-                      fontSize: 17.0, // Ukuran font
-                      fontWeight: FontWeight.bold, // Kekuatan font
-                      color: Colors.black, // Warna teks
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Fasilitas()), // Navigate to TambahMenu
-                );
-                // Navigasi ke halaman Tambahkan Fasilitas & Jam Operasional
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(20),
-                backgroundColor: Color(0xffD7B48F), // Warna latar belakang
-                onPrimary: Colors.black, // Warna teks
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      10), // Tambahkan BorderRadius di sini
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    'Tambahkan fasilitas & Jam operasional',
+                    'Tambahkan Data Toko',
                     style: TextStyle(
                       fontSize: 17.0, // Ukuran font
                       fontWeight: FontWeight.bold, // Kekuatan font
