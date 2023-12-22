@@ -27,7 +27,7 @@ class _BottomNavBarTokoState extends State<BottomNavBarToko> {
   final List<Widget> _tabs = [
     BerandaPage(),
     PromoPage(),
-    PemilikTokoPage1(),
+    PemilikTokoPage(),
   ];
 
   @override

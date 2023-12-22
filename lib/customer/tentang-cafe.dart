@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:coffe_finder/components/navbar-pelanggan.dart';
 import 'package:coffe_finder/customer/ulasan-page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Tab1 extends StatelessWidget {
   const Tab1({Key? key}) : super(key: key);
@@ -35,7 +35,7 @@ class Tab1 extends StatelessWidget {
                 children: [
                   Divider(),
                   SizedBox(height: 20),
-                  Text(
+                  const Text(
                     'Deskripsi',
                     style: TextStyle(
                       fontSize: 17.0,
@@ -67,7 +67,7 @@ class Tab1 extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Jam Operasional',
                           style: TextStyle(
                             fontSize: 17.0,
@@ -95,7 +95,7 @@ class Tab1 extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Fasilitas',
                           style: TextStyle(
                             fontSize: 17.0,
@@ -133,7 +133,7 @@ class Tab1 extends StatelessWidget {
                         Text(
                             'Jl. Kyai Maja No.29 RT.10/RW.7, Kramat Pela, KEC.Kby.Baru.Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta'),
                         SizedBox(height: 20.0),
-                        Text(
+                        const Text(
                           'Petunjuk Jalan',
                           style: TextStyle(
                             fontSize: 17.0,
@@ -414,44 +414,44 @@ class _ProductListPageState extends State<ProductListPage> {
   ];
 
   String selectedCategory = '';
-  List<Product> hotCoffeeProducts = [
-    Product(
+  List<DataToko> hotCoffeeProducts = [
+    DataToko(
       name: 'Cappuccino',
       description: 'Cold and refreshing',
       price: 'Rp15.000',
       category: 'Hot Coffee',
-      image: 'lib/images/KeboonKopi/Cappuccino.jpg',
+      gambar: 'lib/images/KeboonKopi/Cappuccino.jpg',
     ),
-    Product(
+    DataToko(
       name: 'Caffe Latte',
       description: 'Chilled coffee goodness',
       price: 'Rp18.000',
       category: 'Hot Coffee',
-      image: 'lib/images/RimbunKopi/Caffelatte.jpg',
+      gambar: 'lib/images/RimbunKopi/Caffelatte.jpg',
     ),
     // Add more Hot Coffee products as needed
   ];
-  List<Product> iceCoffeeProducts = [
-    Product(
+  List<DataToko> iceCoffeeProducts = [
+    DataToko(
       name: 'Expresso',
       description: 'Cold and refreshing',
       price: 'Rp15.000',
       category: 'Ice Coffee',
-      image: 'lib/images/LoonamiHouse/Bananauyu.jpg',
+      gambar: 'lib/images/LoonamiHouse/Bananauyu.jpg',
     ),
-    Product(
+    DataToko(
       name: 'Americano',
       description: 'Chilled coffee goodness',
       price: 'Rp18.000',
       category: 'Ice Coffee',
-      image: 'lib/images/KeboonKopi/Cappuccino.jpg',
+      gambar: 'lib/images/KeboonKopi/Cappuccino.jpg',
     ),
     // Add more Ice Coffee products as needed
   ];
 
   @override
   Widget build(BuildContext context) {
-    List<Product> displayedProducts = [];
+    List<DataToko> displayedProducts = [];
 
     if (selectedCategory.isNotEmpty) {
       if (selectedCategory == 'Ice Coffee') {
@@ -519,7 +519,7 @@ class _ProductListPageState extends State<ProductListPage> {
           padding: const EdgeInsets.all(0),
           child: Column(
             children: List.generate(displayedProducts.length, (index) {
-              Product product = displayedProducts[index];
+              DataToko product = displayedProducts[index];
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
@@ -533,7 +533,7 @@ class _ProductListPageState extends State<ProductListPage> {
                       borderRadius: BorderRadius.circular(
                           25.0), // Atur borderRadius di sini
                       child: Image.asset(
-                        product.image,
+                        product.gambar,
                         fit: BoxFit.cover,
                         height: 120,
                         width: 120,
@@ -592,19 +592,19 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 }
 
-class Product {
+class DataToko {
   final String name;
   final String description;
   final String price;
   final String category;
-  final String image;
+  final String gambar;
 
-  Product({
+  DataToko({
     required this.name,
     required this.description,
     required this.price,
     required this.category,
-    required this.image,
+    required this.gambar,
   });
 }
 
@@ -617,28 +617,40 @@ class AboutCafe extends StatefulWidget {
 
 class _AboutCafeState extends State<AboutCafe>
     with SingleTickerProviderStateMixin {
-  Stream<QuerySnapshot> readData() {
-    final ulasanStream =
-        FirebaseFirestore.instance.collection('datatoko').snapshots();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    return ulasanStream;
-  }
-
-  final myitems = [
-    'lib/images/kopicatcafebyGroovy/dekorasi/1.jpg',
-    'lib/images/kopicatcafebyGroovy/dekorasi/2.jpg',
-    'lib/images/kopicatcafebyGroovy/dekorasi/3.jpg',
-    'lib/images/kopicatcafebyGroovy/dekorasi/4.jpg',
-    'lib/images/kopicatcafebyGroovy/dekorasi/5.jpg',
-  ];
+  List<String> myitems = []; // List untuk menyimpan path gambar
 
   int myCurrentIndex = 0;
   late TabController tabController;
 
   @override
   void initState() {
-    tabController = TabController(length: 2, vsync: this);
     super.initState();
+    tabController = TabController(length: 2, vsync: this);
+    fetchImagesFromFirestore(); // Fungsi untuk mengambil gambar dari Firestore
+  }
+
+  // Fungsi untuk mengambil path gambar dari koleksi 'datatoko'
+  void fetchImagesFromFirestore() {
+    firestore.collection('datatoko').snapshots().listen((snapshot) {
+      final List<String> images = [];
+      snapshot.docs.forEach((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final fotoPaths = data['fotoPaths'] as List<dynamic>;
+
+        // Loop melalui daftar fotoPaths dan tambahkan semua URL gambar ke dalam list images
+        for (var path in fotoPaths) {
+          if (path is String) {
+            images.add(path);
+          }
+        }
+      });
+
+      setState(() {
+        myitems = images;
+      });
+    });
   }
 
   @override
@@ -682,7 +694,7 @@ class _AboutCafeState extends State<AboutCafe>
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10.0),
-                        child: Image.asset(
+                        child: Image.network(
                           item,
                           width: media.width,
                           fit: BoxFit.cover,
@@ -886,8 +898,8 @@ class _AboutCafeState extends State<AboutCafe>
                                   child: TabBarView(
                                     controller: tabController,
                                     children: [
-                                      Tab1(),
-                                      Tab2(), // Tambahkan widget Tab2 di sini
+                                      Tab1(), // Ganti dengan widget sesuai kebutuhan
+                                      Tab2(), // Ganti dengan widget sesuai kebutuhan
                                     ],
                                   ),
                                 )
@@ -913,7 +925,12 @@ class _AboutCafeState extends State<AboutCafe>
                 child: IconButton(
                   icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BottomNavBarDemo(),
+                      ),
+                    );
                   },
                 ),
               ),

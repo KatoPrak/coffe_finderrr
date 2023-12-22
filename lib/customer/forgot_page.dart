@@ -1,37 +1,133 @@
-import 'package:flutter/material.dart';
 import 'package:coffe_finder/components/my_textfield.dart';
 import 'package:coffe_finder/customer/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-class ForgotPass extends StatelessWidget {
-  ForgotPass({Key? key});
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({super.key});
 
-  // text editing controllers
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
 
-  // sign user in method
-  void signUserIn() {}
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final _emailController = TextEditingController();
+
+  void _sendPasswordResetEmail() async {
+    String email = _emailController.text.trim();
+
+    if (email.isNotEmpty) {
+      try {
+        // Menggunakan Firebase Auth untuk mengirim email reset password
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+        // Menampilkan notifikasi bahwa email reset password telah dikirim
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                  ),
+                  SizedBox(width: 5),
+                  Text('Email Terkirim'),
+                ],
+              ),
+              content: const Text(
+                  'Silakan Periksa Email Anda untuk Instruksi Reset Password!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Tutup notifikasi
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        // Menampilkan notifikasi jika terjadi kesalahan saat mengirim email reset password
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
+                  SizedBox(width: 5),
+                  Text('Peringatan'),
+                ],
+              ),
+              content: const Text('Pastikan Email yang Anda Masukkan Benar!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Tutup notifikasi
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      // Menampilkan notifikasi jika email tidak diisi
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                SizedBox(width: 5),
+                Text('Peringatan'),
+              ],
+            ),
+            content: const Text('Silahkan Masukkan Email Terlebih dahulu!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Tutup notifikasi
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFFF6F0E9),
         appBar: AppBar(
-          backgroundColor: Color(0xFF804A20),
+          backgroundColor: Color.fromRGBO(218, 218, 218, 0.2),
           elevation: 0,
           toolbarHeight: 83,
           title: const Text(
             'Lupa Password',
             style: TextStyle(
               fontSize: 22,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            color: Colors.white,
+            color: Colors.black,
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -42,24 +138,22 @@ class ForgotPass extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 25.0),
           children: <Widget>[
             const SizedBox(height: 100),
-
             const Center(
               child: Text(
-                'Masukkan Email Address',
+                'Masukkan Alamat Email Anda',
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 0, 0, 0),
+                  color: Colors.black,
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
 
-            // username textfield
+            // email textfield
             MyTextField(
-              controller: usernameController,
-              hintText: 'example@gmail.com',
+              controller: _emailController,
+              hintText: 'Email',
               obscureText: false,
             ),
             const SizedBox(height: 150),
@@ -79,7 +173,7 @@ class ForgotPass extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => LoginPage(
                           showRegisterPage: () {},
-                        ), // Corrected the class name
+                        ),
                       ),
                     );
                   },
@@ -95,14 +189,7 @@ class ForgotPass extends StatelessWidget {
             const SizedBox(height: 15),
             AnimatedButton(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(
-                      showRegisterPage: () {},
-                    ), // Corrected the class name
-                  ),
-                );
+                _sendPasswordResetEmail(); // Menambahkan metode yang akan dijalankan saat tombol ditekan
               },
             ),
           ],
@@ -150,7 +237,7 @@ class _AnimatedButtonState extends State<AnimatedButton> {
             duration: const Duration(milliseconds: 300),
             opacity: _opacity,
             child: const Text(
-              "Berikutnya",
+              "Kirim",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -177,5 +264,11 @@ class _AnimatedButtonState extends State<AnimatedButton> {
         }
       });
     }
+  }
+
+  void main() {
+    runApp(const MaterialApp(
+      home: ForgotPasswordPage(),
+    ));
   }
 }

@@ -171,7 +171,7 @@ class _AkunState extends State<Akun> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ForgotPass(),
+                      builder: (context) => ForgotPasswordPage(),
                     ),
                   );
                 }),

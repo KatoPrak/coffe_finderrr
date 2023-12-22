@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coffe_finder/components/bottom_navigation_bar.dart';
+import 'package:coffe_finder/components/navbar-pelanggan.dart';
 import 'package:coffe_finder/components/navbar-toko.dart';
 import 'package:coffe_finder/customer/register_page.dart';
 import 'package:coffe_finder/customer/tentang-cafe.dart';
@@ -210,7 +210,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 15),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -220,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ForgotPass(),
+                        builder: (context) => ForgotPasswordPage(),
                       ),
                     );
                   },

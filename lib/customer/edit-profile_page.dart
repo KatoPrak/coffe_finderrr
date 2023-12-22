@@ -1,8 +1,11 @@
-import 'dart:typed_data';
-
-import 'package:coffe_finder/utils.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coffe_finder/customer/akun-page.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -12,26 +15,113 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  Uint8List? _image;
+  final ImagePicker picker = ImagePicker();
+  File? fotoPath;
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController bioController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  List<String> genderOptions = ['Laki-laki', 'Perempuan'];
+  String selectedGender = 'Jenis Kelamin';
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
 
-  void selectImage() async {
-    final Uint8List? img = await pickImage(ImageSource.gallery);
-    if (img != null) {
+  Future<File?> selectPhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
       setState(() {
-        _image = img;
+        fotoPath = File(pickedFile.path);
       });
+      return File(pickedFile.path);
+    } else {
+      // Handle jika pengguna tidak memilih foto
+      return null;
+    }
+  }
+
+  void loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.email)
+            .get();
+
+        setState(() {
+          nameController.text = userDoc['username'] ?? '';
+          emailController.text = user.email ?? '';
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
     }
   }
 
   void saveProfile() async {
-    String name = nameController.text;
-    String bio = bioController.text;
+    try {
+      String? fotoUrl;
 
-    // Assuming you have a function to save the data and image
-    // StoreData().saveData(name: name, bio: bio, file: _image!);
-    // Replace the above line with your actual logic.
+      // Cek jika foto telah dipilih
+      if (fotoPath != fotoPath) {
+        String filePath = 'userprofile/${DateTime.now()}.png';
+        await FirebaseStorage.instance.ref(filePath).putFile(fotoPath!);
+        fotoUrl = await FirebaseStorage.instance.ref(filePath).getDownloadURL();
+      }
+
+      final user = FirebaseAuth.instance.currentUser;
+      final String uid = user?.uid ?? '';
+
+      // Simpan data profil ke koleksi 'data customer' di Firestore
+      await FirebaseFirestore.instance
+          .collection('data_customer')
+          .doc(uid)
+          .set({
+        'username': nameController.text,
+        'email': emailController.text,
+        'phone': phoneController.text,
+        'alamat': alamatController.text,
+        'jenis kelamin': selectedGender,
+        'foto': fotoUrl
+        // tambahkan kolom lain sesuai kebutuhan
+      });
+
+      // Tambahan: Jika Anda juga ingin memperbarui data pengguna di koleksi 'users'
+      // bisa menggunakan kode berikut:
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user?.email)
+          .update({
+        'username': nameController.text,
+        'email': emailController.text,
+      });
+
+      // Jangan lupa menampilkan pesan sukses atau navigasi ke halaman lain jika diperlukan.
+      print('Profile berhasil disimpan!');
+
+      Fluttertoast.showToast(
+        msg: 'Data berhasil diubah!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+      // Navigasi ke halaman akun setelah berhasil menyimpan
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Akun()),
+      );
+    } catch (e) {
+      print('Error saving profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
   }
 
   @override
@@ -41,7 +131,14 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Color(0xff804A20),
         leading: IconButton(
           color: Colors.white,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Akun(),
+              ),
+            );
+          },
           icon: Icon(Icons.navigate_before),
         ),
         title: Text(
@@ -64,7 +161,7 @@ class _ProfileState extends State<Profile> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: _image != null
+                    child: fotoPath != null
                         ? Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -81,11 +178,11 @@ class _ProfileState extends State<Profile> {
                                 ),
                               ],
                             ),
-                            child: CircleAvatar(
-                              radius: 55,
-                              backgroundColor: Colors.white,
-                              backgroundImage: MemoryImage(_image!),
-                            ),
+                            // child: CircleAvatar(
+                            //   radius: 55,
+                            //   backgroundColor: Colors.white,
+                            //   backgroundImage: MemoryImage(fotoPath!),
+                            // ),
                           )
                         : Container(
                             decoration: BoxDecoration(
@@ -107,13 +204,13 @@ class _ProfileState extends State<Profile> {
                               radius: 55,
                               backgroundColor: Colors.white,
                               backgroundImage: NetworkImage(
-                                  'https://png.pngitem.com/pimgs/s/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png'),
+                                  'https://png.pngitem.com/pimgs/s/421-4212266_transparent-default-avatar.png'),
                             ),
                           ),
                   ),
                   Positioned(
                     child: IconButton(
-                      onPressed: selectImage,
+                      onPressed: selectPhoto,
                       icon: const Icon(Icons.add_a_photo),
                       color: Colors.blue,
                     ),
@@ -157,7 +254,7 @@ class _ProfileState extends State<Profile> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xff757575),
+                        color: Color.fromARGB(255, 117, 117, 117),
                       ),
                     ),
                   ],
@@ -166,31 +263,12 @@ class _ProfileState extends State<Profile> {
               Padding(
                 padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
+                  controller: emailController,
+                  readOnly: true,
                   decoration: InputDecoration(
                     hintText: 'Masukkan teks di sini',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: Row(
-                  children: [
-                    Text(
-                      'Nomor Telepon: ',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff757575)),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan teks di sini',
+                    hintStyle:
+                        TextStyle(color: Colors.black), // Warna teks label
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -202,9 +280,45 @@ class _ProfileState extends State<Profile> {
                     Text(
                       'Jenis Kelamin: ',
                       style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff757575)),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff757575),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: DropdownButtonFormField<String>(
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGender = value!;
+                    });
+                  },
+                  items: genderOptions
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: Row(
+                  children: [
+                    Text(
+                      'Nomor Telepon: ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff757575),
+                      ),
                     ),
                   ],
                 ),
@@ -212,8 +326,10 @@ class _ProfileState extends State<Profile> {
               Padding(
                 padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    hintText: 'Masukkan teks di sini',
+                    hintText: 'Tambahkan Nomor Telepon di sini',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -225,9 +341,10 @@ class _ProfileState extends State<Profile> {
                     Text(
                       'Alamat: ',
                       style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff757575)),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff757575),
+                      ),
                     ),
                   ],
                 ),
@@ -235,8 +352,9 @@ class _ProfileState extends State<Profile> {
               Padding(
                 padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                 child: TextField(
+                  controller: alamatController,
                   decoration: InputDecoration(
-                    hintText: 'Masukkan teks di sini',
+                    hintText: 'Masukkan Alamat di sini',
                     border: OutlineInputBorder(),
                   ),
                 ),
