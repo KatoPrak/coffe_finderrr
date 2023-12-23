@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-void main() => runApp(MaterialApp(
-      home: PromoPage1(),
-    ));
 
 class PromoPage1 extends StatefulWidget {
   const PromoPage1({Key? key}) : super(key: key);
@@ -15,73 +9,6 @@ class PromoPage1 extends StatefulWidget {
 }
 
 class _PromoPageState extends State<PromoPage1> {
-  String? uid = '';
-  String combinedData = ''; // Untuk menyimpan hasil penggabungan data
-
-  Future<String> user() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    return auth.currentUser?.uid ?? '';
-  }
-
-  Future<void> joinCollections() async {
-    try {
-      // Ambil data dari koleksi 'promo' berdasarkan UID
-      QuerySnapshot promoSnapshot = await FirebaseFirestore.instance
-          .collection('promo')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Ambil data dari koleksi 'users' berdasarkan UID
-      QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Buat peta untuk menyimpan data pengguna
-      Map<String, dynamic> usersData = {};
-
-      // Proses data dari koleksi 'users'
-      usersSnapshot.docs.forEach((usersDoc) {
-        usersData = usersDoc.data() as Map<String, dynamic>;
-      });
-
-      // Gabungkan data dari kedua koleksi
-      promoSnapshot.docs.forEach((promoDoc) {
-        // Ambil atribut yang Anda butuhkan dari dokumen promo
-        String imagePromo = promoDoc['gambar'] ??
-            ''; // Menggunakan '' jika 'gambar' adalah null
-        String judulPromo =
-            promoDoc['judul'] ?? ''; // Menggunakan '' jika 'judul' adalah null
-
-        // Gunakan data pengguna yang telah diambil sebelumnya
-        String username = usersData['username'] ??
-            ''; // Menggunakan '' jika 'username' adalah null
-
-        // Tambahkan data yang telah digabungkan ke combinedData
-        combinedData += 'Nama User: $username\n';
-        combinedData += 'Judul Promo: $judulPromo\n';
-        combinedData += 'Gambar Promo: $imagePromo\n';
-        combinedData += '\n'; // Tambahkan pemisah antara data
-      });
-
-      // Setelah menggabungkan data, perbarui tampilan jika diperlukan
-      setState(() {});
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    user().then((value) {
-      setState(() {
-        uid = value;
-      });
-      joinCollections(); // Panggil fungsi joinCollections setelah mendapatkan UID.
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,23 +20,19 @@ class _PromoPageState extends State<PromoPage1> {
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.white, // Set the text color to white
           ),
         ),
-        backgroundColor: Color(0xFF804A20),
+        backgroundColor: Color(0xFF804A20), // Set the app bar color
         elevation: 0,
       ),
-      body: PromoList(combinedData: combinedData),
+      body: PromoList(),
     );
   }
 }
 
+// Halaman Promo (Dibuat sebagai widget terpisah untuk memudahkan)
 class PromoList extends StatelessWidget {
-  final String
-      combinedData; // Terima hasil penggabungan data dari _PromoPageState
-
-  PromoList({required this.combinedData});
-
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -121,16 +44,17 @@ class PromoList extends StatelessWidget {
               top: 10,
               left: 10,
               right: 10,
-            ),
+            ), // Tambahkan jarak atas dan bawah
             child: ClipRRect(
               borderRadius: BorderRadius.all(
-                Radius.circular(25),
+                Radius.circular(25), // Border radius kanan bawah
               ),
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Color.fromARGB(255, 170, 170, 170),
-                    width: 2.0,
+                    color: Color.fromARGB(
+                        255, 170, 170, 170), // Warna garis pinggir
+                    width: 2.0, // Lebar garis pinggir
                   ),
                 ),
                 child: Image.asset(
@@ -143,7 +67,8 @@ class PromoList extends StatelessWidget {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding:
+                const EdgeInsets.all(10), // Tambahkan jarak 10 pada semua sisi
             child: Text(
               "Daftar Promo seru ☕️",
               style: GoogleFonts.montserrat(
@@ -156,11 +81,25 @@ class PromoList extends StatelessWidget {
         SliverList(
           delegate: SliverChildListDelegate(
             <Widget>[
-              // Split combinedData menjadi baris-baris
-              for (var data in combinedData.split('\n'))
-                if (data.isNotEmpty) // Memastikan tidak ada baris kosong
-                  PromoCard(data: data),
-              SizedBox(height: 20),
+              Promo(
+                imagePromo: "lib/images/ilustrasi.jpg",
+                nameToko: "Kopi Kenangan",
+                namePromo: "Beli 2 Gratis 1",
+                idPromo: "1",
+              ),
+              Promo(
+                imagePromo: "lib/images/promo1.jpeg",
+                nameToko: "Toko Kenanganku",
+                namePromo: "Promo spesial Weekend",
+                idPromo: "2",
+              ),
+              Promo(
+                imagePromo: "lib/images/promo2.webp",
+                nameToko: "Starbucks",
+                namePromo: "Beli 1 Gratis 1",
+                idPromo: "3",
+              ),
+              SizedBox(height: 20), // Tambahkan jarak vertikal sebesar 20
             ],
           ),
         ),
@@ -169,19 +108,22 @@ class PromoList extends StatelessWidget {
   }
 }
 
-class PromoCard extends StatelessWidget {
-  final String data;
+class Promo extends StatelessWidget {
+  final String imagePromo;
+  final String nameToko;
+  final String namePromo;
+  final String idPromo;
 
-  PromoCard({required this.data});
+  const Promo({
+    Key? key,
+    required this.imagePromo,
+    required this.nameToko,
+    required this.namePromo,
+    required this.idPromo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Pisahkan data menjadi atribut yang sesuai
-    var parts = data.split('\n');
-    var nameToko = parts[0].substring('Nama User: '.length);
-    var namePromo = parts[1].substring('Judul Promo: '.length);
-    var imagePromo = parts[2].substring('Gambar Promo: '.length);
-
     return InkWell(
       onTap: () {
         // Tambahkan tindakan yang ingin diambil ketika item promo diklik di sini
@@ -196,8 +138,8 @@ class PromoCard extends StatelessWidget {
         elevation: 10,
         child: Column(
           children: [
-            Image.network(
-              imagePromo, // Menggunakan URL gambar dari Firebase Storage
+            Image.asset(
+              imagePromo,
               width: double.infinity,
               height: 150,
               fit: BoxFit.cover,
@@ -205,7 +147,8 @@ class PromoCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(10),
               child: Align(
-                alignment: Alignment.centerLeft,
+                alignment:
+                    Alignment.centerLeft, // Posisikan teks ke kiri (start)
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

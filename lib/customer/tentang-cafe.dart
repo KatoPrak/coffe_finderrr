@@ -143,28 +143,27 @@ class Tab1 extends StatelessWidget {
                         ),
                         SizedBox(height: 15.0),
                         Container(
-                            width: double.maxFinite,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GestureDetector(
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
+                          width: double.maxFinite,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
                               ),
-                            )),
+                            ],
+                          ),
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -188,6 +187,33 @@ class Tab1 extends StatelessWidget {
                                 .map((DocumentSnapshot document) {
                               Map<String, dynamic> data =
                                   document.data() as Map<String, dynamic>;
+// Langkah 1: Ambil email pengguna dari koleksi "datatoko"
+                              String username = 'username';
+
+// Langkah 2: Menggunakan email untuk mengambil data pengguna dari koleksi "pengguna"
+                              CollectionReference usersCollection =
+                                  FirebaseFirestore.instance
+                                      .collection('users');
+
+                              DocumentReference userDocument =
+                                  usersCollection.doc(username);
+
+// Mengambil data pengguna
+                              userDocument
+                                  .get()
+                                  .then((DocumentSnapshot userSnapshot) {
+                                if (userSnapshot.exists) {
+                                  // Data pengguna ditemukan, Anda dapat mengakses field yang Anda butuhkan
+                                  var username = userSnapshot['username'];
+
+                                  print('Username: $username');
+                                } else {
+                                  // Pengguna dengan email yang dicari tidak ditemukan
+                                  print('Pengguna tidak ditemukan.');
+                                }
+                              }).catchError((error) {
+                                print('Error: $error');
+                              });
 
                               // Periksa apakah 'fotoPaths' ada dalam data
                               List<String> imagePaths =

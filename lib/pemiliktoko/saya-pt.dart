@@ -1,7 +1,8 @@
 import 'package:coffe_finder/pemiliktoko/data-toko.dart';
+import 'package:coffe_finder/pemiliktoko/kelola-toko.dart';
 import 'package:flutter/material.dart';
 
-class PemilikTokoPage extends StatelessWidget {
+class PemilikTokoPage1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +77,7 @@ class PemilikTokoPage extends StatelessWidget {
               indent: 20,
               endIndent: 20,
             ),
-            buildMenuItem(Icons.settings, 'Pengaturan',PemilikTokoPage(),context),
+            buildMenuItem(Icons.settings, 'Pengaturan',PemilikTokoPage1(),context),
             Divider(
               thickness: 1,
               color: Colors.grey,
@@ -84,14 +85,14 @@ class PemilikTokoPage extends StatelessWidget {
               endIndent: 20,
             ),
             buildMenuItem(
-                Icons.store, 'Kelola Toko',DataToko(),context), // Ubah ikon menjadi bisnis
+                Icons.store, 'Kelola Toko',KelolaToko(),context), // Ubah ikon menjadi bisnis
             Divider(
               thickness: 1,
               color: Colors.grey,
               indent: 20,
               endIndent: 20,
             ),
-            buildMenuItem(Icons.logout, 'Logout',PemilikTokoPage(),context),
+            buildMenuItem(Icons.logout, 'Logout',PemilikTokoPage1(),context),
             Divider(
               thickness: 1,
               color: Colors.grey,
@@ -146,7 +147,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
-      home: PemilikTokoPage(),
+      home: PemilikTokoPage1(),
     );
   }
 }

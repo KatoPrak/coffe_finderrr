@@ -80,11 +80,11 @@ class PromoPage extends StatelessWidget {
   }
 }
 
-class PemilikTokoPage1 extends StatelessWidget {
+class PemilikTokoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: PemilikTokoPage(),
+      child: PemilikTokoPage1(),
     );
   }
 }

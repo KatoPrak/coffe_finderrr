@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coffe_finder/customer/akun-page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,8 +17,7 @@ class _ProfileState extends State<Profile> {
   final ImagePicker picker = ImagePicker();
   File? fotoPath;
   String? newPhotoUrl;
-  String?
-      currentPhotoUrl; // Tambahkan variabel untuk menyimpan URL foto saat ini
+  String? currentPhotoUrl;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   List<String> genderOptions = ['Laki-laki', 'Perempuan'];
@@ -28,7 +26,6 @@ class _ProfileState extends State<Profile> {
   final TextEditingController alamatController = TextEditingController();
 
   Future<File?> selectPhoto() async {
-    final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
@@ -36,12 +33,10 @@ class _ProfileState extends State<Profile> {
         fotoPath = File(pickedFile.path);
       });
 
-      // Simpan URL gambar yang baru ditambahkan
       newPhotoUrl = pickedFile.path;
 
       return File(pickedFile.path);
     } else {
-      // Handle jika pengguna tidak memilih foto
       return null;
     }
   }
@@ -56,7 +51,6 @@ class _ProfileState extends State<Profile> {
             .doc(user.email)
             .get();
 
-        // Ambil data dari koleksi 'data_customer'
         final DocumentSnapshot dataCustomerDoc = await FirebaseFirestore
             .instance
             .collection('data_customer')
@@ -89,7 +83,6 @@ class _ProfileState extends State<Profile> {
     try {
       String? fotoUrl;
 
-      // Cek jika foto telah dipilih
       if (fotoPath != null) {
         String filePath = 'userprofile/${DateTime.now()}.png';
         await FirebaseStorage.instance.ref(filePath).putFile(fotoPath!);
@@ -100,7 +93,6 @@ class _ProfileState extends State<Profile> {
       final user = FirebaseAuth.instance.currentUser;
       final String uid = user?.uid ?? '';
 
-      // Simpan data profil ke koleksi 'data customer' di Firestore
       await FirebaseFirestore.instance
           .collection('data_customer')
           .doc(uid)
@@ -111,21 +103,8 @@ class _ProfileState extends State<Profile> {
         'alamat': alamatController.text,
         'jenis kelamin': selectedGender,
         'foto': fotoUrl
-
-        // tambahkan kolom lain sesuai kebutuhan
       });
 
-      // Tambahan: Jika Anda juga ingin memperbarui data pengguna di koleksi 'users'
-      // bisa menggunakan kode berikut:
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user?.email)
-          .update({
-        'username': nameController.text,
-        'email': emailController.text,
-      });
-
-      // Jangan lupa menampilkan pesan sukses atau navigasi ke halaman lain jika diperlukan.
       print('Profile berhasil disimpan!');
 
       Fluttertoast.showToast(
@@ -136,11 +115,8 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-      // Navigasi ke halaman akun setelah berhasil menyimpan
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Akun()),
-      );
+
+      Navigator.pop(context); // Kembali ke halaman sebelumnya
     } catch (e) {
       print('Error saving profile: $e');
     }
@@ -160,12 +136,7 @@ class _ProfileState extends State<Profile> {
         leading: IconButton(
           color: Colors.white,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Akun(),
-              ),
-            );
+            Navigator.pop(context); // Kembali ke halaman sebelumnya
           },
           icon: Icon(Icons.navigate_before),
         ),
@@ -206,6 +177,11 @@ class _ProfileState extends State<Profile> {
                                 ),
                               ],
                             ),
+                            child: CircleAvatar(
+                              radius: 55,
+                              backgroundColor: Colors.white,
+                              backgroundImage: MemoryImage(fotoPath!.readAsBytesSync()),
+                            ),
                           )
                         : Container(
                             decoration: BoxDecoration(
@@ -227,9 +203,9 @@ class _ProfileState extends State<Profile> {
                               radius: 55,
                               backgroundColor: Colors.white,
                               backgroundImage: currentPhotoUrl != null
-                                  ? AssetImage(currentPhotoUrl!)
-                                  : AssetImage(
-                                      'lib/images/profile-guest.png'),
+                                  ? NetworkImage(currentPhotoUrl!)
+                                  : NetworkImage(
+                                      'https://png.pngitem.com/pimgs/s/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png'),
                             ),
                           ),
                   ),
@@ -292,130 +268,41 @@ class _ProfileState extends State<Profile> {
                   readOnly: true,
                   decoration: InputDecoration(
                     hintText: 'Masukkan Email di sini',
-                    hintStyle:
-                        TextStyle(color: Colors.black), // Warna teks label
+                    hintStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: Row(
-                  children: [
-                    Text(
-                      'Jenis Kelamin: ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff757575),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: DropdownButtonFormField<String>(
-                  hint: Text(selectedGender != 'Jenis Kelamin'
-                      ? selectedGender
-                      : 'Pilih Jenis Kelamin'),
-                  onChanged: (value) {
-                    print('Selected Gender: $value');
-                    setState(() {
-                      selectedGender = value!;
-                    });
-                  },
-                  items: genderOptions
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: Row(
-                  children: [
-                    Text(
-                      'Nomor Telepon: ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff757575),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    hintText: 'Tambahkan Nomor Telepon di sini',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: Row(
-                  children: [
-                    Text(
-                      'Alamat: ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff757575),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: TextField(
-                  controller: alamatController,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Alamat di sini',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: InkWell(
-                    onTap: () {
-                      saveProfile();
-                    },
-                    child: Container(
-                      color: Color(0xff4E598C),
-                      width: double.infinity,
-                      height: 60,
-                      child: Center(
-                        child: Text(
-                          'Simpan',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // ... Tambahkan bagian lain dari tampilan profil Anda di sini
             ],
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        height: 70,
+        child: ElevatedButton(
+          onPressed: saveProfile,
+          style: ElevatedButton.styleFrom(primary: Color(0xFF4E598C)),
+          child: Text(
+            'Simpan',
+            style: TextStyle(
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
+          ),
+        ),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    alamatController.dispose();
+    super.dispose();
   }
 }
