@@ -1,5 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: PromoPage1(),
+    );
+  }
+}
 
 class PromoPage1 extends StatefulWidget {
   const PromoPage1({Key? key}) : super(key: key);
@@ -20,10 +38,10 @@ class _PromoPageState extends State<PromoPage1> {
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white, // Set the text color to white
+            color: Colors.white,
           ),
         ),
-        backgroundColor: Color(0xFF804A20), // Set the app bar color
+        backgroundColor: Color(0xFF804A20),
         elevation: 0,
       ),
       body: PromoList(),
@@ -31,8 +49,11 @@ class _PromoPageState extends State<PromoPage1> {
   }
 }
 
-// Halaman Promo (Dibuat sebagai widget terpisah untuk memudahkan)
 class PromoList extends StatelessWidget {
+  const PromoList({
+    Key? key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -44,17 +65,16 @@ class PromoList extends StatelessWidget {
               top: 10,
               left: 10,
               right: 10,
-            ), // Tambahkan jarak atas dan bawah
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.all(
-                Radius.circular(25), // Border radius kanan bawah
+                Radius.circular(25),
               ),
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Color.fromARGB(
-                        255, 170, 170, 170), // Warna garis pinggir
-                    width: 2.0, // Lebar garis pinggir
+                    color: Color.fromARGB(255, 170, 170, 170),
+                    width: 2.0,
                   ),
                 ),
                 child: Image.asset(
@@ -67,8 +87,7 @@ class PromoList extends StatelessWidget {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding:
-                const EdgeInsets.all(10), // Tambahkan jarak 10 pada semua sisi
+            padding: const EdgeInsets.all(10),
             child: Text(
               "Daftar Promo seru ☕️",
               style: GoogleFonts.montserrat(
@@ -78,29 +97,30 @@ class PromoList extends StatelessWidget {
             ),
           ),
         ),
-        SliverList(
-          delegate: SliverChildListDelegate(
-            <Widget>[
-              Promo(
-                imagePromo: "lib/images/ilustrasi.jpg",
-                nameToko: "Kopi Kenangan",
-                namePromo: "Beli 2 Gratis 1",
-                idPromo: "1",
-              ),
-              Promo(
-                imagePromo: "lib/images/promo1.jpeg",
-                nameToko: "Toko Kenanganku",
-                namePromo: "Promo spesial Weekend",
-                idPromo: "2",
-              ),
-              Promo(
-                imagePromo: "lib/images/promo2.webp",
-                nameToko: "Starbucks",
-                namePromo: "Beli 1 Gratis 1",
-                idPromo: "3",
-              ),
-              SizedBox(height: 20), // Tambahkan jarak vertikal sebesar 20
-            ],
+        SliverFillRemaining(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('promo').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Something went wrong');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              return ListView(
+                children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                  Map<String, dynamic> data =
+                      document.data() as Map<String, dynamic>;
+                  return Promo(
+                    gambar: data['gambar'], // URL or path to the image
+                    namePromo: data['judul'], // Title of the promo
+                    username: data['username'], // Username from Firestore
+                  );
+                }).toList(),
+              );
+            },
           ),
         ),
       ],
@@ -109,25 +129,22 @@ class PromoList extends StatelessWidget {
 }
 
 class Promo extends StatelessWidget {
-  final String imagePromo;
-  final String nameToko;
+  final String gambar;
   final String namePromo;
-  final String idPromo;
+  final String username;
 
   const Promo({
     Key? key,
-    required this.imagePromo,
-    required this.nameToko,
+    required this.gambar,
     required this.namePromo,
-    required this.idPromo,
+    required this.username,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Tambahkan tindakan yang ingin diambil ketika item promo diklik di sini
-        // Contoh: Navigasi ke halaman detail promo
+        // Implement action when promo is tapped
       },
       child: Card(
         clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -138,36 +155,44 @@ class Promo extends StatelessWidget {
         elevation: 10,
         child: Column(
           children: [
-            Image.asset(
-              imagePromo,
+            Image.network(
+              gambar,
               width: double.infinity,
               height: 150,
               fit: BoxFit.cover,
             ),
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Align(
-                alignment:
-                    Alignment.centerLeft, // Posisikan teks ke kiri (start)
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      nameToko,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: Row(
+                // Use Row instead of Column
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    username,
+                    style: GoogleFonts.rubik(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Text(
-                      namePromo,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  SizedBox(width: 5),
+                  Text(
+                    '|',
+                    style: GoogleFonts.rubik(
+                      fontSize: 20,
+                      fontWeight: FontWeight.normal,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                      width: 5), // Add some space between the two Text widgets
+                  Text(
+                    namePromo,
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -1,3 +1,5 @@
+import 'package:coffe_finder/customer/tentang-cafe.dart';
+import 'package:coffe_finder/pemiliktoko/tentang-pt.dart';
 import 'package:flutter/material.dart';
 import 'package:coffe_finder/pemiliktoko/buat-promo.dart';
 
@@ -56,12 +58,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
           toolbarHeight: 80,
           backgroundColor: Colors.white,
-          elevation: 0,
           centerTitle: false,
           title: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               SizedBox(
                 height: 30,
               ),
@@ -97,75 +97,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
               fit: BoxFit.cover,
             ),
             Positioned(
-              top: 165,
-              left: 20,
-              right: 20,
-              child: Container(
-                height: 105,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFFB06B5F).withOpacity(0.8),
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.0,
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 10,
+                top: 165,
+                left: 20,
+                right: 20,
+                child: InkWell(
+                  onTap: () {
+                    // Ketika kontainer diklik, pindah ke halaman lain di sini
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TentangPt(), // Ganti DetailPage() dengan halaman tujuan Anda
                       ),
-                      ClipOval(
-                        child: Image(
-                          image: AssetImage('lib/images/starbucks.jpeg'),
-                          height: 65,
-                          width: 65,
-                          fit: BoxFit.cover,
-                        ),
+                    );
+                  },
+                  child: Container(
+                    height: 105,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFB06B5F).withOpacity(0.8),
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1.0,
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
                         children: [
                           SizedBox(
-                            height: 20, // Ubah tinggi sesuai kebutuhan Anda
+                            width: 10,
                           ),
-                          Text(
-                            'Starbucks',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
+                          ClipOval(
+                            child: Image(
+                              image: AssetImage('lib/images/starbucks.jpeg'),
+                              height: 65,
+                              width: 65,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           SizedBox(
-                            height: 10,
+                            width: 20,
                           ),
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildStarIcons(rating),
-                              SizedBox(width: 5),
+                              SizedBox(
+                                height: 20, // Ubah tinggi sesuai kebutuhan Anda
+                              ),
                               Text(
-                                '$rating',
+                                'Starbucks',
                                 style: TextStyle(
-                                  fontSize: 15,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24,
                                 ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  _buildStarIcons(rating),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    '$rating',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
+                )),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -205,7 +216,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     width: 400,
                     child: TextButton(
                       onPressed: () {
-                        BuatPromo();
+                        // Gunakan Navigator.push untuk berpindah ke halaman BuatPromo
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => BuatPromo()),
+                        );
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Color(0xFF4E598C),

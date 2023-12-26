@@ -123,9 +123,9 @@ class Tab1 extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kopi Cat Cafe By Groovy',
+                          'Alamat',
                           style: TextStyle(
-                            fontSize: 17.0,
+                            fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -643,6 +643,7 @@ class AboutCafe extends StatefulWidget {
 
 class _AboutCafeState extends State<AboutCafe>
     with SingleTickerProviderStateMixin {
+  String username = '';
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   List<String> myitems = []; // List untuk menyimpan path gambar
@@ -761,7 +762,7 @@ class _AboutCafeState extends State<AboutCafe>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Kopi Cat Cafe By Groovy",
+                        "Starbucks",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: MediaQuery.of(context).size.width * 0.06,

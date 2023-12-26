@@ -18,8 +18,7 @@ class _ProfileState extends State<Profile> {
   final ImagePicker picker = ImagePicker();
   File? fotoPath;
   String? newPhotoUrl;
-  String?
-      currentPhotoUrl; // Tambahkan variabel untuk menyimpan URL foto saat ini
+  String? currentPhotoUrl;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   List<String> genderOptions = ['Laki-laki', 'Perempuan'];
@@ -111,7 +110,6 @@ class _ProfileState extends State<Profile> {
         'alamat': alamatController.text,
         'jenis kelamin': selectedGender,
         'foto': fotoUrl
-
         // tambahkan kolom lain sesuai kebutuhan
       });
 
@@ -189,49 +187,44 @@ class _ProfileState extends State<Profile> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: fotoPath != null
-                        ? Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 2.0,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
+                    child: ClipOval(
+                      child: fotoPath != null
+                          ? Container(
+                              width: 110.0,
+                              height: 110.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2.0,
                                 ),
-                              ],
-                            ),
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 2.0,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
+                              child: Image.file(
+                                fotoPath!,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Container(
+                              width: 110.0,
+                              height: 110.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2.0,
                                 ),
-                              ],
+                              ),
+                              child: currentPhotoUrl != null
+                                  ? Image.network(
+                                      currentPhotoUrl!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      'https://png.pngitem.com/pimgs/s/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png',
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
-                            child: CircleAvatar(
-                              radius: 55,
-                              backgroundColor: Colors.white,
-                              backgroundImage: currentPhotoUrl != null
-                                  ? AssetImage(currentPhotoUrl!)
-                                  : AssetImage(
-                                      'lib/images/profile-guest.png'),
-                            ),
-                          ),
+                    ),
                   ),
                   Positioned(
                     child: IconButton(

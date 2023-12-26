@@ -1,9 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coffe_finder/auth/auth_page.dart';
 import 'package:coffe_finder/customer/edit-profile_page.dart';
 import 'package:coffe_finder/customer/forgot_page.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Akun extends StatefulWidget {
@@ -17,6 +17,7 @@ class _AkunState extends State<Akun> {
   String username = '';
   String userEmail = '';
   String userRole = '';
+  String fotoUrl = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
@@ -35,10 +36,19 @@ class _AkunState extends State<Akun> {
             .doc(user.email)
             .get();
 
+        final DocumentSnapshot dataCustomerDoc = await FirebaseFirestore
+            .instance
+            .collection('data_customer')
+            .doc(user.uid)
+            .get();
+
         setState(() {
-          username = userDoc['username'] ?? '';
-          userEmail = user.email ?? '';
+          username = userDoc['username'];
+          userEmail = user.email ??
+              ''; // Jika user.email null, maka gunakan string kosong
           userRole = userDoc['role'] ?? '';
+          // Ambil URL foto dan tampilkan
+          fotoUrl = dataCustomerDoc['foto'] as String? ?? '';
         });
       }
     } catch (e) {
@@ -73,8 +83,10 @@ class _AkunState extends State<Akun> {
                         padding: EdgeInsets.fromLTRB(30, 25, 20, 0),
                         child: CircleAvatar(
                           radius: 30,
-                          backgroundImage:
-                              AssetImage('lib/images/profile-guest.png'),
+                          backgroundImage: fotoUrl != null && fotoUrl.isNotEmpty
+                              ? NetworkImage(fotoUrl)
+                              : Image.asset('lib/images/profile-guest.png')
+                                  .image,
                         ),
                       ),
                       Expanded(

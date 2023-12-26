@@ -54,7 +54,7 @@ class _BottomNavBarTokoState extends State<BottomNavBarToko> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Saya',
+            label: 'Akun',
           ),
         ],
       ),

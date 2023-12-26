@@ -1,6 +1,7 @@
 import 'package:coffe_finder/customer/login_page.dart';
 import 'package:coffe_finder/customer/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);

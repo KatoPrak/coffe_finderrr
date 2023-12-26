@@ -54,7 +54,7 @@ class _BottomNavBarDemoState extends State<BottomNavBarDemo> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Saya',
+            label: 'Akun',
           ),
         ],
       ),

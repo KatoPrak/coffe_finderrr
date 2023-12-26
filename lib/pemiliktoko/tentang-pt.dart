@@ -1,20 +1,39 @@
+import 'package:coffe_finder/components/navbar-pelanggan.dart';
+import 'package:coffe_finder/components/navbar-toko.dart';
+import 'package:coffe_finder/customer/home-page.dart';
 import 'package:coffe_finder/customer/ulasan-page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
+
+final Uri _url = Uri.parse('https://flutter.dev');
 
 class Tab1 extends StatelessWidget {
   const Tab1({Key? key}) : super(key: key);
 
+  // Fungsi untuk meluncurkan URL.
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await canLaunchUrl(url)) {
+      throw 'Could not launch $urlString';
+    }
+    await launchUrl(url);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // URL untuk Google Maps.
+    final String mapUrl =
+        'https://maps.app.goo.gl/uBu1wkYd5mXAPSBv8'; // Ganti dengan URL tujuan yang spesifik
+
     return Scaffold(
       body: GestureDetector(
         onTap: () {
-          // Handle the tap on the main body
           print('Widget diketuk!');
         },
         child: SingleChildScrollView(
@@ -134,49 +153,60 @@ class Tab1 extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 15.0),
-                      Container(
-                        width: double.maxFinite,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
+                      GestureDetector(
+                        onTap: () => _launchUrl(mapUrl),
+                        child: Container(
+                          padding: EdgeInsets.all(16.0),
+                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF2F2F2),
+                            borderRadius: BorderRadius.circular(15.0),
+                            border: Border.all(
+                              color: Color.fromARGB(20, 0, 0, 0),
+                              width: 1.0,
                             ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
-                          child: Image.asset(
-                            'lib/images/maps.webp',
-                            alignment: Alignment.center,
-                            width: 355.0,
-                            height: 180.0,
-                            fit: BoxFit.cover,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15.0),
+                            child: Image.asset(
+                              'lib/images/maps.webp',
+                              alignment: Alignment.center,
+                              width: 355.0,
+                              height: 180.0,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: List.generate(5, (index) => index + 1)
+                              .map((index) {
+                            return ReviewCard(
+                              username: 'John Doe $index',
+                              rating: 4,
+                              comment:
+                                  'Tempat yang bagus untuk nongkrong $index.',
+                              imagePaths: [
+                                'lib/images/plastik.jpeg',
+                                'lib/images/plastik.jpeg',
+                                'lib/images/plastik.jpeg',
+                              ],
+                              guestProfilePhoto: 'lib/images/profile-guest.png',
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    children:
-                        List.generate(5, (index) => index + 1).map((index) {
-                      return ReviewCard(
-                        username: 'John Doe $index',
-                        rating: 4,
-                        comment: 'Tempat yang bagus untuk nongkrong $index.',
-                        imagePaths: [
-                          'lib/images/plastik.jpeg',
-                          'lib/images/plastik.jpeg',
-                          'lib/images/plastik.jpeg',
-                        ],
-                        guestProfilePhoto: 'lib/images/profile-guest.png',
-                      );
-                    }).toList(),
                   ),
                 ),
               ],
@@ -186,14 +216,6 @@ class Tab1 extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    MaterialApp(
-      home: Tab1(),
-    ),
-  );
 }
 
 class ReviewCard extends StatelessWidget {
@@ -376,29 +398,15 @@ class _ProductListPageState extends State<ProductListPage> {
       category: 'Hot Coffee',
       image: 'lib/images/KeboonKopi/Cappuccino.jpg',
     ),
-    Product(
-      name: 'Caffe Latte',
-      description: 'Chilled coffee goodness',
-      price: 'Rp18.000',
-      category: 'Hot Coffee',
-      image: 'lib/images/RimbunKopi/Caffelatte.jpg',
-    ),
     // Add more Ice Coffee products as needed
   ];
   List<Product> iceCoffeeProducts = [
     Product(
-      name: 'Expresso',
-      description: 'Cold and refreshing',
+      name: 'Banana',
+      description: 'Cold',
       price: 'Rp15.000',
       category: 'Ice Coffee',
       image: 'lib/images/LoonamiHouse/Bananauyu.jpg',
-    ),
-    Product(
-      name: 'Americano',
-      description: 'Chilled coffee goodness',
-      price: 'Rp18.000',
-      category: 'Ice Coffee',
-      image: 'lib/images/LoonamiHouse/Blackcurrenttea.jpg',
     ),
     // Add more Ice Coffee products as needed
   ];
@@ -943,17 +951,22 @@ class _AboutCafeState extends State<AboutCafe>
               top: 80,
               left: 10,
               child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color.fromARGB(190, 217, 217, 217),
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromARGB(190, 217, 217, 217),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              BottomNavBarToko(), // Ganti HalamanTujuan dengan halaman yang ingin Anda tuju.
+                        ),
+                      );
+                    },
+                  )),
             ),
           ],
         ),

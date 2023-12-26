@@ -1,3 +1,5 @@
+import 'package:coffe_finder/components/navbar-toko.dart';
+import 'package:coffe_finder/customer/tentang-cafe.dart';
 import 'package:coffe_finder/pemiliktoko/data-toko.dart';
 import 'package:coffe_finder/pemiliktoko/buat-menu.dart';
 import 'package:coffe_finder/pemiliktoko/buat-promo.dart';
@@ -116,8 +118,8 @@ class KelolaToko extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          DataToko()), // Navigate to TambahMenu
+                    builder: (context) => BottomNavBarToko(),
+                  ), // Navigate to TambahMenu
                 );
                 // Navigasi ke halaman Tambahkan Foto Toko
               },

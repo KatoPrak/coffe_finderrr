@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -27,6 +28,7 @@ class BuatPromo extends StatefulWidget {
 }
 
 class _BuatPromoState extends State<BuatPromo> {
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController judulPromoController = TextEditingController();
 
   Iterable<ImageFile> images = [];
@@ -37,11 +39,53 @@ class _BuatPromoState extends State<BuatPromo> {
   );
   bool isUploading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Load user data including username from Firestore
+    loadUserData();
+  }
+
+  void loadUserData() async {
+    try {
+      final userEmail = FirebaseAuth.instance.currentUser?.email;
+
+      if (userEmail != null) {
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userEmail)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            nameController.text = userDoc['username'] ?? '';
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
+  }
+
   Future<void> _uploadImage() async {
     // Validate input fields
     if (judulPromoController.text.isEmpty || images.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Harap isi judul promo dan pilih gambar produk!')),
+        SnackBar(
+          content: Text('Harap isi judul promo dan pilih gambar produk!'),
+        ),
+      );
+      return;
+    }
+
+    // Get the current user's username from Firestore
+    String? username = nameController.text;
+
+    if (username == null || username.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Username tidak ditemukan!'),
+        ),
       );
       return;
     }
@@ -72,14 +116,15 @@ class _BuatPromoState extends State<BuatPromo> {
         await uploadTask.whenComplete(() async {
           String imageUrl = await ref.getDownloadURL();
 
-          // Save promo data to Firestore
-          final CollectionReference promoCollection =
-              FirebaseFirestore.instance.collection('promo');
+          // Save promo data to Firestore using username as document ID
+          final DocumentReference promoDoc =
+              FirebaseFirestore.instance.collection('promo').doc(username);
 
-          await promoCollection.add({
+          await promoDoc.set({
             'judul': judulPromoController.text,
+            'username': username,
             'gambar': imageUrl,
-            // Add more fields as needed
+            // Add other fields as needed
           });
 
           // Clear input fields
@@ -122,6 +167,16 @@ class _BuatPromoState extends State<BuatPromo> {
           children: <Widget>[
             SizedBox(height: 50.0),
             TextField(
+              controller: nameController,
+              readOnly: true, // Make it read-only
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Username',
+                hintText: 'Username akan diisi otomatis',
+              ),
+            ),
+            SizedBox(height: 20.0),
+            TextField(
               controller: judulPromoController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -150,7 +205,14 @@ class _BuatPromoState extends State<BuatPromo> {
         height: 70,
         child: ElevatedButton(
           onPressed: () {
-            _uploadImage();
+            setState(() {
+              isUploading = true;
+            });
+            _uploadImage().whenComplete(() {
+              setState(() {
+                isUploading = false;
+              });
+            });
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Color(0xFF4E598C),
